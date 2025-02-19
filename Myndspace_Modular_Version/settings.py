@@ -28,8 +28,8 @@ INSTALLED_APPS = [
     
     # Local apps
     'users',
-    'appointments.apps.AppointmentsConfig',  # Changed from 'appointments'
-    'chat.apps.ChatConfig',                   # Changed from 'chat'
+    'appointments.apps.AppointmentsConfig',  
+    'chat.apps.ChatConfig',                   
 ]
 
 MIDDLEWARE = [
