@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="chat-container">
+    <h2>Chat with {{ room.doctor.get_full_name|default:room.doctor.username }}</h2>
+
+    <div id="chat-messages">
+        {% for message in messages %}
+        <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+            <div class="message-content">{{ message.message }}</div>
+            <div class="message-time">{{ message.timestamp }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div id="chat-input">
+        <input type="text" id="message-input" placeholder="Type your message...">
+        <button id="send-button">Send</button>
+    </div>
+</div>
+
+<script>
+const chatSocket = new WebSocket(
+    'ws://' + window.location.host +
+    '/ws/chat/{{ room.id }}/'
+);
+
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    const messagesDiv = document.getElementById('chat-messages');
+
+    if(data.type === 'message') {
+        const messageHTML = `
+        <div class="message ${data.sender === '{{ request.user.username }}' ? 'sent' : 'received'}">
+            <div class="message-content">${data.message}</div>
+            <div class="message-time">${new Date(data.timestamp).toLocaleString()}</div>
+        </div>`;
+        messagesDiv.innerHTML += messageHTML;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+};
+
+document.querySelector('#send-button').onclick = function(e) {
+    const messageInput = document.querySelector('#message-input');
+    const message = messageInput.value.trim();
+
+    if(message) {
+        chatSocket.send(JSON.stringify({
+            'type': 'message',
+            'message': message
+        }));
+        messageInput.value = '';
+    }
+};
+
+// Keep connection alive
+setInterval(() => {
+    chatSocket.send(JSON.stringify({'type': 'ping'}));
+}, 25000);
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Navigation</h5>
+                    <div class="list-group">
+                        {% if user.is_doctor %}
+                        <a href="{% url 'manage_slots' %}" class="list-group-item list-group-item-action">
+                            Manage Time Slots
+                        </a>
+                        {% else %}
+                        <a href="{% url 'book_appointment' %}" class="list-group-item list-group-item-action">
+                            Book Appointment
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'chat_list' %}" class="list-group-item list-group-item-action">
+                            Messages {% if unread_count %} <span class="badge bg-primary">{{ unread_count }}</span>{% endif %}
+                        </a>
+                        <a href="{% url 'profile_setup' %}" class="list-group-item list-group-item-action">
+                            Profile Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Welcome, {{ user.get_full_name|default:user.username }}</h3>
+
+                    <!-- Appointments Section -->
+                    <div class="mt-4">
+                        <h5>Upcoming Appointments</h5>
+                        {% if appointments %}
+                        <div class="list-group">
+                            {% for appointment in appointments %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        {% if user.is_doctor %}
+                                        With {{ appointment.client.get_full_name|default:appointment.client.username }}
+                                        {% else %}
+                                        With Dr. {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}
+                                        {% endif %}
+                                    </h6>
+                                    <small>{{ appointment.date|date:"M d, Y H:i" }}</small>
+                                </div>
+                                <p class="mb-1">
+                                    Status: <span class="badge
+                        {% if appointment.status == 'Confirmed' %}bg-success
+                        {% elif appointment.status == 'Pending' %}bg-warning
+                        {% else %}bg-danger{% endif %}">
+                                        {{ appointment.status }}
+                                    </span>
+                                </p>
+
+                                <!-- Add Confirm and Cancel Buttons -->
+                                <div class="mt-2">
+                                    {% if user.is_doctor and appointment.status == 'Pending' %}
+                                    <a href="{% url 'confirm_appointment' appointment.id %}" class="btn btn-success btn-sm">
+                                        <i class="bi bi-check-circle"></i> Confirm
+                                    </a>
+                                    {% endif %}
+
+                                    {% if appointment.status != 'Cancelled' %}
+                                    <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-x-circle"></i> Cancel
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No upcoming appointments</p>
+                        {% endif %}
+                    </div>
+                    <!-- Zoom connection status -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Zoom Integration</h5>
+                            {% if user.is_doctor %}
+                            {% if user.doctor_profile.zoom_access_token %}
+                            <span class="badge bg-success">Connected to Zoom</span>
+                            <p class="mt-2">Your Zoom account is linked and ready for meetings!</p>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <a href="{% url 'zoom_authorize' %}" class="btn btn-primary btn-sm">
+                                    Connect Zoom Account
+                                </a>
+                                <span class="ms-2">Required for video appointments</span>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!-- Quick Actions -->
+                    <div class="row mt-4">
+                        {% if user.is_doctor %}
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Available Slots</h5>
+                                    {% if time_slots %}
+                                    <ul class="list-group">
+                                        {% for slot in time_slots %}
+                                        <li class="list-group-item">
+                                            {{ slot.date|date:"M d" }} {{ slot.start_time|time:"H:i" }}-{{ slot.end_time|time:"H:i" }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="text-muted">No available slots</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Recent Messages</h5>
+                                    {% if active_chats %}
+                                    <div class="list-group">
+                                        {% for chat in active_chats %}
+                                        <a href="{% url 'chat_room' chat.id %}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">
+                                                    {% if user.is_doctor %}
+                                                    {{ chat.client.get_full_name }}
+                                                    {% else %}
+                                                    Dr. {{ chat.doctor.get_full_name }}
+                                                    {% endif %}
+                                                </h6>
+                                                <small>{{ chat.last_message|timesince }} ago</small>
+                                            </div>
+                                            <p class="mb-1 text-muted small">Last message: {{ chat.messages.last.message|truncatechars:30 }}</p>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                    {% else %}
+                                    <p class="text-muted">No recent messages</p>
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
