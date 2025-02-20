@@ -40,10 +40,23 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
+
+        if data.get('type') == 'read_receipt':
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat.read_receipt',
+                    'message_id': data['message_id'],
+                    'reader': self.user.username
+                }
+        )
+
         try:
             data = json.loads(text_data)
             message_type = data['type']
             
+
+
             if message_type == 'ping':
                 await self.send(json.dumps({'type': 'pong'}))
             elif message_type == 'typing':
@@ -166,3 +179,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def mark_message_read(self, message_id):
         ChatMessage.objects.filter(id=message_id).update(read=True)
+
+
+    

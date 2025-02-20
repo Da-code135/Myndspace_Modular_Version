@@ -26,37 +26,5 @@ class DoctorProfile(models.Model):
     specialization = models.CharField(max_length=100, default="General")
     experience = models.PositiveIntegerField(default=0)
     
-    # Zoom integration fields
-    zoom_access_token = models.CharField(max_length=255, blank=True, null=True)
-    zoom_refresh_token = models.CharField(max_length=255, blank=True, null=True)
-    zoom_token_expires_at = models.DateTimeField(blank=True, null=True)
-
-    def refresh_zoom_token(self):
-        """Instance method to refresh token (alternative approach)"""
-        if self.zoom_token_expires_at and self.zoom_token_expires_at > timezone.now():
-            return self.zoom_access_token
-        
-        try:
-            response = requests.post(
-                settings.ZOOM_TOKEN_URL,
-                data={
-                    "grant_type": "refresh_token",
-                    "refresh_token": self.zoom_refresh_token
-                },
-                auth=(settings.ZOOM_CLIENT_ID, settings.ZOOM_CLIENT_SECRET)
-            )
-            response.raise_for_status()
-            
-            tokens = response.json()
-            self.zoom_access_token = tokens["access_token"]
-            self.zoom_refresh_token = tokens["refresh_token"]
-            self.zoom_token_expires_at = timezone.now() + timedelta(seconds=tokens["expires_in"])
-            self.save()
-            return self.zoom_access_token
-        
-        except Exception as e:
-            print(f"Failed to refresh Zoom token: {str(e)}")
-            return None
-
     def __str__(self):
         return f"{self.user.username}'s Profile"

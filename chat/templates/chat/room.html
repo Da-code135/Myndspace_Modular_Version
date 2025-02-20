@@ -1,46 +1,145 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
 {% block content %}
-<div id="chat-container">
-    <h2>Chat with {{ room.doctor.get_full_name|default:room.doctor.username }}</h2>
+<div class="chat-container">
+    <div class="chat-header">
+        <h2 class="mb-3">
+            Chat with {{ room.doctor.get_full_name|default:room.doctor.username }}
+            <small class="text-muted">(Room #{{ room.id }})</small>
+        </h2>
+    </div>
 
-    <div id="chat-messages">
+    <div class="chat-messages" id="chat-messages">
         {% for message in messages %}
         <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
             <div class="message-content">{{ message.message }}</div>
-            <div class="message-time">{{ message.timestamp }}</div>
+            <div class="message-meta">
+                <small class="message-time">{{ message.timestamp|date:"H:i" }}</small>
+                {% if message.sender == request.user %}
+                <span class="message-status">
+                    {% if message.read %}✓✓{% else %}✓{% endif %}
+                </span>
+                {% endif %}
+            </div>
         </div>
         {% endfor %}
     </div>
 
-    <div id="chat-input">
-        <input type="text" id="message-input" placeholder="Type your message...">
-        <button id="send-button">Send</button>
+    <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type your message..." class="form-control">
+        <button id="send-button" class="btn btn-primary">
+            <i class="bi bi-send"></i> Send
+        </button>
     </div>
 </div>
+
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 0 auto;
+        height: 80vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .message {
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 1rem;
+        max-width: 70%;
+    }
+
+        .message.received {
+            background-color: #ffffff;
+            margin-right: auto;
+            border: 1px solid #dee2e6;
+        }
+
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+    .message-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        opacity: 0.8;
+    }
+
+    .message-status {
+        margin-left: 0.5rem;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem 0;
+    }
+
+    #message-input {
+        flex: 1;
+        border-radius: 20px;
+        padding: 0.75rem 1.25rem;
+    }
+</style>
 
 <script>
 const chatSocket = new WebSocket(
     'ws://' + window.location.host +
-    '/ws/chat/{{ room.id }}/'
+    '/ws/chat/room/{{ room.id }}/'  // Updated URL pattern
 );
 
+// Message handling
 chatSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     const messagesDiv = document.getElementById('chat-messages');
 
     if(data.type === 'message') {
+        const isSent = data.sender === '{{ request.user.username }}';
         const messageHTML = `
-        <div class="message ${data.sender === '{{ request.user.username }}' ? 'sent' : 'received'}">
-            <div class="message-content">${data.message}</div>
-            <div class="message-time">${new Date(data.timestamp).toLocaleString()}</div>
-        </div>`;
-        messagesDiv.innerHTML += messageHTML;
+            <div class="message ${isSent ? 'sent' : 'received'}">
+                <div class="message-content">${data.message}</div>
+                <div class="message-meta">
+                    <small class="message-time">
+                        ${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </small>
+                    ${isSent ? `<span class="message-status">${data.read ? '✓✓' : '✓'}</span>` : ''}
+                </div>
+            </div>`;
+
+        messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    else if(data.type === 'read_receipt') {
+        document.querySelectorAll(`.message.sent .message-status`).forEach(span => {
+            span.textContent = '✓✓';
+        });
     }
 };
 
-document.querySelector('#send-button').onclick = function(e) {
+// Message sending
+document.querySelector('#send-button').addEventListener('click', sendMessage);
+document.querySelector('#message-input').addEventListener('keypress', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+function sendMessage() {
     const messageInput = document.querySelector('#message-input');
     const message = messageInput.value.trim();
 
@@ -51,11 +150,37 @@ document.querySelector('#send-button').onclick = function(e) {
         }));
         messageInput.value = '';
     }
+}
+
+// Connection handling
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+    showConnectionWarning();
 };
+
+chatSocket.onerror = function(err) {
+    console.error('WebSocket error:', err);
+    showConnectionWarning();
+};
+
+function showConnectionWarning() {
+    const warning = document.createElement('div');
+    warning.className = 'alert alert-danger mt-3';
+    warning.textContent = 'Connection lost. Please refresh the page.';
+    document.querySelector('.chat-container').appendChild(warning);
+}
 
 // Keep connection alive
 setInterval(() => {
-    chatSocket.send(JSON.stringify({'type': 'ping'}));
+    if(chatSocket.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify({'type': 'ping'}));
+    }
 }, 25000);
+
+// Initial scroll to bottom
+window.addEventListener('DOMContentLoaded', () => {
+    const messagesDiv = document.getElementById('chat-messages');
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
 </script>
 {% endblock %}

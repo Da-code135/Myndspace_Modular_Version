@@ -1,6 +1,8 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from Myndspace_Modular_Version import settings
 from users.models import User
 
 class TimeSlot(models.Model):
@@ -38,7 +40,9 @@ class Appointment(models.Model):
         ("Confirmed", "Confirmed"),
         ("Cancelled", "Cancelled")
     ], default="Pending")
-    zoom_meeting_link = models.URLField(blank=True, null=True)
+    room_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    notes = models.TextField(blank=True)
+    
 
     def confirm(self):
         self.status = "Confirmed"
@@ -53,3 +57,11 @@ class Appointment(models.Model):
             self.time_slot.is_booked = False
             self.time_slot.save()
         self.save()
+
+    def __str__(self):
+        return f"Appointment {self.id} - {self.doctor} & {self.client}"
+
+    def generate_room_id(self):
+        if not self.room_id:
+            self.room_id = uuid.uuid4()
+        return self.room_id

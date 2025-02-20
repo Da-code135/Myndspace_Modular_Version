@@ -32,6 +32,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="appointments\consumers.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="appointments\routing.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="appointments\serializers.py">
       <SubType>Code</SubType>
     </Compile>
@@ -106,10 +112,13 @@
     <Content Include=".env" />
     <Content Include="appointments\templates\appointments\book_appointment.html" />
     <Content Include="appointments\templates\appointments\manage_slots.html" />
+    <Content Include="appointments\templates\appointments\video_call.html" />
     <Content Include="appointments\templates\base.html" />
     <Content Include="chat\templates\base.html" />
+    <Content Include="chat\templates\chat\chat_landing.html" />
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\room.html" />
+    <Content Include="chat\templates\chat\start_chat.html" />
     <Content Include="requirements.txt" />
     <Content Include="static\steamroomandselfcare\css\style.css" />
     <Content Include="static\steamroomandselfcare\js\breathing.js" />

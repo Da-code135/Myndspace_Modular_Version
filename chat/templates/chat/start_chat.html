@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="bi bi-plus-circle me-2"></i>Start New Chat
+            </h3>
+        </div>
+
+        <div class="card-body">
+            {% if users %}
+            <div class="list-group">
+                {% for user in users %}
+                <a href="{% url 'start_chat' user.id %}"
+                   class="list-group-item list-group-item-action d-flex align-items-center">
+                    <div class="avatar me-3">
+                        <i class="bi bi-person-circle fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">{{ user.get_full_name|default:user.username }}</h5>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                No available users to start a chat with
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="video-container">
+    <div class="main-video">
+        <video id="local-video" autoplay muted></video>
+        <div class="controls">
+            <button id="toggle-video" class="btn-control">
+                <i class="bi bi-camera-video"></i>
+            </button>
+            <button id="toggle-audio" class="btn-control">
+                <i class="bi bi-mic"></i>
+            </button>
+            <button id="share-screen" class="btn-control">
+                <i class="bi bi-laptop"></i>
+            </button>
+            <button id="end-call" class="btn-control btn-danger">
+                <i class="bi bi-telephone-x"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="participants" id="remote-videos"></div>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Type message...">
+            <button id="send-message" class="btn-control">
+                <i class="bi bi-send"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const config = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        // Add TURN servers here for production
+    ]
+};
+
+let localStream;
+let peerConnections = {};
+const roomId = "{{ room_id }}";
+
+// Initialize WebSocket connection
+const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const wsPath = `${wsScheme}://${window.location.host}/ws/video/${roomId}/`;
+const ws = new WebSocket(wsPath);
+
+// WebRTC Setup
+async function initializeCall() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+        document.getElementById('local-video').srcObject = localStream;
+
+        // Send offer to other participants
+        ws.send(JSON.stringify({
+            type: 'join',
+            user: "{{ request.user.username }}"
+        }));
+    } catch (error) {
+        console.error('Error accessing media devices:', error);
+    }
+}
+
+// WebSocket message handling
+ws.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+
+    switch(data.type) {
+        case 'offer':
+            await handleOffer(data);
+            break;
+        case 'answer':
+            await handleAnswer(data);
+            break;
+        case 'candidate':
+            await handleCandidate(data);
+            break;
+        case 'chat':
+            displayChatMessage(data);
+            break;
+        case 'user-list':
+            updateParticipants(data.users);
+            break;
+    }
+};
+
+// WebRTC Handlers
+async function createPeerConnection(userId) {
+    const pc = new RTCPeerConnection(config);
+
+    // Add local stream to connection
+    localStream.getTracks().forEach(track => {
+        pc.addTrack(track, localStream);
+    });
+
+    // Handle remote streams
+    pc.ontrack = (event) => {
+        const remoteVideo = document.createElement('video');
+        remoteVideo.autoplay = true;
+        remoteVideo.srcObject = event.streams[0];
+        document.getElementById('remote-videos').appendChild(remoteVideo);
+    };
+
+    // ICE Candidate handling
+    pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            ws.send(JSON.stringify({
+                type: 'candidate',
+                candidate: event.candidate,
+                target: userId
+            }));
+        }
+    };
+
+    return pc;
+}
+
+// Control Handlers
+document.getElementById('toggle-video').addEventListener('click', () => {
+    const videoTrack = localStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+});
+
+document.getElementById('toggle-audio').addEventListener('click', () => {
+    const audioTrack = localStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+});
+
+document.getElementById('share-screen').addEventListener('click', async () => {
+    try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia();
+        const screenTrack = screenStream.getVideoTracks()[0];
+
+        // Replace video track in all peer connections
+        Object.values(peerConnections).forEach(pc => {
+            const sender = pc.getSenders().find(s => s.track.kind === 'video');
+            sender.replaceTrack(screenTrack);
+        });
+    } catch (error) {
+        console.error('Screen sharing failed:', error);
+    }
+});
+
+// Initialize call when page loads
+initializeCall();
+</script>
+
+<style>
+    .video-container {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 20px;
+        height: 80vh;
+    }
+
+    .main-video video {
+        width: 100%;
+        height: 70vh;
+        background: #000;
+        border-radius: 10px;
+    }
+
+    .participants {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .chat-container {
+        border-left: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-control {
+        padding: 15px;
+        border-radius: 50%;
+        border: none;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}
