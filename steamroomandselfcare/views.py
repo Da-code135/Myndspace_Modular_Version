@@ -24,7 +24,7 @@ def thought_log(request):
             thought = form.save(commit=False)
             thought.user = request.user  # assumes user is authenticated
             thought.save()
-            return redirect('steamroomandselfcare:thought_log')
+            return redirect('steamroomandselfcare:thought_logs')
     else:
         form = ThoughtLogForm()
     # Retrieve the user's thought logs
