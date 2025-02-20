@@ -153,6 +153,7 @@
     <Folder Include="chat\migrations\" />
     <Folder Include="chat\templates\" />
     <Folder Include="chat\templates\chat\" />
+    <Folder Include="static\" />
     <Folder Include="static\steamroomandselfcare\" />
     <Folder Include="static\steamroomandselfcare\audio\" />
     <Folder Include="static\steamroomandselfcare\css\" />
