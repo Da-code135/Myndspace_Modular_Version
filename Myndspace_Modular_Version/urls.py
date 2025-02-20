@@ -9,4 +9,5 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('appointments/', include('appointments.urls')),
     path('chat/', include('chat.urls')),
+    path('selfcare/', include('steamroomandselfcare.urls', namespace='steamroomandselfcare')),
 ]

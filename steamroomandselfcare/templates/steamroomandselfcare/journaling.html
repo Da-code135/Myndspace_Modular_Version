@@ -1,0 +1,14 @@
+<!-- steamroomandselfcare/templates/steamroomandselfcare/journaling.html -->
+{% extends "steamroomandselfcare/base.html" %}
+{% block content %}
+<h2>Journaling Prompt</h2>
+<p>Reflect on the following prompt:</p>
+<blockquote>
+    What positive moment did you experience today?
+</blockquote>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="journal_entry" rows="6" cols="50" placeholder="Write your thoughts here..."></textarea>
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

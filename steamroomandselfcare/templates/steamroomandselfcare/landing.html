@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Steam room and Self-Care{% endblock %}
+
+{% block content %}
+<div class="self-care-landing" style="max-width: 800px; margin: 2rem auto; text-align: center;">
+    <h1>Welcome to Self-Care</h1>
+    <p>Enhance your mental wellness with the following features:</p>
+    <ul style="list-style-type: none; padding: 0;">
+        <li style="margin: 1rem 0;">
+            <a href="{% url 'steamroomandselfcare:breathing_exercise' %}" class="btn-primary" style="padding: 0.8rem 1.5rem; text-decoration: none;">
+                Breathing Exercise & Journaling
+            </a>
+        </li>
+        <li style="margin: 1rem 0;">
+            <a href="{% url 'steamroomandselfcare:thought_log' %}" class="btn-primary" style="padding: 0.8rem 1.5rem; text-decoration: none;">
+                Thought Logs
+            </a>
+        </li>
+        <li style="margin: 1rem 0;">
+            <a href="{% url 'steamroomandselfcare:meditation' %}" class="btn-primary" style="padding: 0.8rem 1.5rem; text-decoration: none;">
+                Meditation & Mindfulness
+            </a>
+        </li>
+    </ul>
+</div>
+{% endblock %}

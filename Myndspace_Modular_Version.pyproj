@@ -58,6 +58,22 @@
     <Compile Include="Myndspace_Modular_Version\asgi.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="steamroomandselfcare\admin.py" />
+    <Compile Include="steamroomandselfcare\apps.py" />
+    <Compile Include="steamroomandselfcare\forms.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="steamroomandselfcare\migrations\__init__.py" />
+    <Compile Include="steamroomandselfcare\models.py" />
+    <Compile Include="steamroomandselfcare\nlp.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="steamroomandselfcare\tests.py" />
+    <Compile Include="steamroomandselfcare\urls.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="steamroomandselfcare\views.py" />
+    <Compile Include="steamroomandselfcare\__init__.py" />
     <Compile Include="users\admin.py" />
     <Compile Include="appointments\admin.py" />
     <Compile Include="appointments\apps.py" />
@@ -68,6 +84,9 @@
     <Compile Include="appointments\__init__.py" />
     <Compile Include="users\apps.py" />
     <Compile Include="users\forms.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="users\middleware.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="users\migrations\__init__.py" />
@@ -92,6 +111,18 @@
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\room.html" />
     <Content Include="requirements.txt" />
+    <Content Include="steamroomandselfcare\static\steamroomandselfcare\js\breathing.js">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="steamroomandselfcare\static\steamroomandselfcare\css\style.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\landing.html" />
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\meditation.html" />
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\base.html" />
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\breathing_exercise.html" />
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\journaling.html" />
+    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\thought_logs.html" />
     <Content Include="users\templates\dashboard.html" />
     <Content Include="users\templates\base.html" />
     <Content Include="users\templates\landing_page.html" />
@@ -120,6 +151,16 @@
     <Folder Include="chat\migrations\" />
     <Folder Include="chat\templates\" />
     <Folder Include="chat\templates\chat\" />
+    <Folder Include="steamroomandselfcare\" />
+    <Folder Include="steamroomandselfcare\migrations\" />
+    <Folder Include="steamroomandselfcare\static\" />
+    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\" />
+    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\js\" />
+    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\images\" />
+    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\audio\" />
+    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\css\" />
+    <Folder Include="steamroomandselfcare\templates\" />
+    <Folder Include="steamroomandselfcare\templates\steamroomandselfcare\" />
     <Folder Include="users\" />
     <Folder Include="appointments\" />
     <Folder Include="appointments\migrations\" />

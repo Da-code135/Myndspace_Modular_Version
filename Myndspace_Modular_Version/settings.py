@@ -27,7 +27,9 @@ INSTALLED_APPS = [
     'rest_framework',
     
     # Local apps
+    
     'users',
+    'steamroomandselfcare',
     'appointments.apps.AppointmentsConfig',  
     'chat.apps.ChatConfig',                   
 ]
@@ -40,6 +42,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.LoginRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'Myndspace_Modular_Version.urls'
