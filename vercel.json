@@ -24,7 +24,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "manage.py"
+            "dest": "Myndspace_Modular_Version/wsgi.py"
         }
     ]
 }
