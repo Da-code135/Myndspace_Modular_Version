@@ -24,9 +24,11 @@
                         <a href="{% url 'profile_setup' %}" class="list-group-item list-group-item-action">
                             Profile Settings
                         </a>
+                        {%if user.is_client %}
                         <a href="{% url 'steamroomandselfcare:landing_page' %}" class="list-group-item list-group-item-action">
                             SteamRoom and SelfCare
                         </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

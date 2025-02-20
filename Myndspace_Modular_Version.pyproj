@@ -111,6 +111,8 @@
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\room.html" />
     <Content Include="requirements.txt" />
+    <Content Include="static\steamroomandselfcare\css\style.css" />
+    <Content Include="static\steamroomandselfcare\js\breathing.js" />
     <Content Include="steamroomandselfcare\static\steamroomandselfcare\js\breathing.js">
       <SubType>Code</SubType>
     </Content>
@@ -151,6 +153,11 @@
     <Folder Include="chat\migrations\" />
     <Folder Include="chat\templates\" />
     <Folder Include="chat\templates\chat\" />
+    <Folder Include="static\steamroomandselfcare\" />
+    <Folder Include="static\steamroomandselfcare\audio\" />
+    <Folder Include="static\steamroomandselfcare\css\" />
+    <Folder Include="static\steamroomandselfcare\images\" />
+    <Folder Include="static\steamroomandselfcare\js\" />
     <Folder Include="steamroomandselfcare\" />
     <Folder Include="steamroomandselfcare\migrations\" />
     <Folder Include="steamroomandselfcare\static\" />
