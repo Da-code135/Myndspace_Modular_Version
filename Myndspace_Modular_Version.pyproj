@@ -107,6 +107,9 @@
     <Content Include="appointments\templates\appointments\book_appointment.html" />
     <Content Include="appointments\templates\appointments\manage_slots.html" />
     <Content Include="appointments\templates\base.html" />
+    <Content Include="build_files.sh">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="chat\templates\base.html" />
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\room.html" />
