@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
         {
-            "src": "Myndspace_Modular_Version/wsgi.py",
+            "src": "manage.py",
             "use": "@vercel/python",
             "config": {
                 "maxLambdaSize": "15mb",
@@ -16,8 +16,6 @@
                 "distDir": "staticfiles_build"
             }
         }
-        
-
     ],
     "routes": [
         {
@@ -26,9 +24,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "Myndspace_Modular_Version/wsgi.py"
+            "dest": "manage.py"
         }
     ]
-    
- }
-
+}
