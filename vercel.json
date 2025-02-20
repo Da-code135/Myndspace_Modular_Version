@@ -15,7 +15,9 @@
             "config": {
                 "distDir": "staticfiles_build"
             }
-        }
+        },
+        
+
     ],
     "routes": [
         {
@@ -27,4 +29,12 @@
             "dest": "Myndspace_Modular_Version/wsgi.py"
         }
     ]
+    {
+  "build": {
+    "env": {
+      "PYTHON_VERSION": "3.9"
+    }
+  }
+}
+
 }
