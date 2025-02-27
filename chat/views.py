@@ -47,7 +47,7 @@ def chat_room(request, room_id):
     return render(request, 'chat/room.html', {
         'room': room,
         'messages': messages,
-        'WEBSOCKET_URL': settings.WEBSOCKET_URL
+       
     })
 
 @login_required

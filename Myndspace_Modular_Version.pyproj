@@ -6,6 +6,7 @@
     <RootNamespace>Myndspace_Modular_Version</RootNamespace>
     <InterpreterId>MSBuild|django_web|$(MSBuildProjectFullPath)</InterpreterId>
     <TestFramework>Pytest</TestFramework>
+    <WebBrowserPort>8000</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>

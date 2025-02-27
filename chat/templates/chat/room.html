@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="chat-container">
-    <div class="chat-header">
+    <div id="chat-container" data-room-id="{{ room.id }}">
         <h2 class="mb-3">
             Chat with {{ room.doctor.get_full_name|default:room.doctor.username }}
             <small class="text-muted">(Room #{{ room.id }})</small>
         </h2>
     </div>
-    {{ room_name|json_script:"room-name" }}
+    
     <div class="chat-messages" id="chat-messages">
         {% for message in messages %}
         <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
@@ -32,7 +32,7 @@
         </button>
     </div>
 </div>
-    
+
 
 <style>
     .chat-container {
@@ -96,98 +96,94 @@
         padding: 0.75rem 1.25rem;
     }
 </style>
-
 <script>
-    const roomName = JSON.parse(document.getElementById('room-name').textContent);
-    const room_id = "{{ room_id }}";
-    const websocketUrl = "{{ WEBSOCKET_URL }}";
+    const chatContainer = document.getElementById('chat-container');
+    const room_id = "{{ room.id }}"; // Access room_id from room object
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsPath = wsScheme + "://" + window.location.host + "/ws/chat/" + room_id + "/";
 
-    let wsPath = websocketUrl;
-    if (!websocketUrl.endsWith('/')) {
-        wsPath += '/';
-    }
-    wsPath += 'ws/chat/' + room_id + '/';
+    console.log("WebSocket URL:", wsPath); // Check console output for the value
 
     const chatSocket = new WebSocket(wsPath);
-// Message handling
-chatSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    const messagesDiv = document.getElementById('chat-messages');
 
-    if(data.type === 'message') {
-        const isSent = data.sender === '{{ request.user.username }}';
-        const messageHTML = `
-            <div class="message ${isSent ? 'sent' : 'received'}">
-                <div class="message-content">${data.message}</div>
-                <div class="message-meta">
-                    <small class="message-time">
-                        ${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </small>
-                    ${isSent ? `<span class="message-status">${data.read ? '✓✓' : '✓'}</span>` : ''}
-                </div>
-            </div>`;
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messagesDiv = document.getElementById('chat-messages');
 
-        messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+        if(data.type === 'message') {
+            const isSent = data.sender === '{{ request.user.username }}';
+            const messageHTML = `
+                <div class="message ${isSent ? 'sent' : 'received'}">
+                    <div class="message-content">${data.message}</div>
+                    <div class="message-meta">
+                        <small class="message-time">
+                            ${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </small>
+                        ${isSent ? `<span class="message-status">${data.read ? '✓✓' : '✓'}</span>` : ''}
+                    </div>
+                </div>`;
+
+            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        else if(data.type === 'read_receipt') {
+            document.querySelectorAll(`.message.sent .message-status`).forEach(span => {
+                span.textContent = '✓✓';
+            });
+        }
+    };
+
+    // Message sending
+    document.querySelector('#send-button').addEventListener('click', sendMessage);
+    document.querySelector('#message-input').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        const messageInput = document.querySelector('#message-input');
+        const message = messageInput.value.trim();
+
+        if(message) {
+            chatSocket.send(JSON.stringify({
+                'type': 'message',
+                'message': message
+}));
+            messageInput.value = '';
+        }
+    }
+
+    // Connection handling
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+        showConnectionWarning();
+    };
+
+    chatSocket.onerror = function(err) {
+        console.error('WebSocket error:', err);
+        showConnectionWarning();
+    };
+
+    function showConnectionWarning() {
+        const warning = document.createElement('div');
+        warning.className = 'alert alert-danger mt-3';
+        warning.textContent = 'Connection lost. Please refresh the page.';
+        document.querySelector('.chat-container').appendChild(warning);
+    }
+
+    // Keep connection alive
+    setInterval(() => {
+        if(chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({'type': 'ping'}));
+        }
+    }, 25000);
+
+    // Initial scroll to bottom
+    window.addEventListener('DOMContentLoaded', () => {
+        const messagesDiv = document.getElementById('chat-messages');
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-    else if(data.type === 'read_receipt') {
-        document.querySelectorAll(`.message.sent .message-status`).forEach(span => {
-            span.textContent = '✓✓';
-        });
-    }
-};
-
-// Message sending
-document.querySelector('#send-button').addEventListener('click', sendMessage);
-document.querySelector('#message-input').addEventListener('keypress', (e) => {
-    if(e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-    }
-});
-
-function sendMessage() {
-    const messageInput = document.querySelector('#message-input');
-    const message = messageInput.value.trim();
-
-    if(message) {
-        chatSocket.send(JSON.stringify({
-            'type': 'message',
-            'message': message
-        }));
-        messageInput.value = '';
-    }
-}
-
-// Connection handling
-chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-    showConnectionWarning();
-};
-
-chatSocket.onerror = function(err) {
-    console.error('WebSocket error:', err);
-    showConnectionWarning();
-};
-
-function showConnectionWarning() {
-    const warning = document.createElement('div');
-    warning.className = 'alert alert-danger mt-3';
-    warning.textContent = 'Connection lost. Please refresh the page.';
-    document.querySelector('.chat-container').appendChild(warning);
-}
-
-// Keep connection alive
-setInterval(() => {
-    if(chatSocket.readyState === WebSocket.OPEN) {
-        chatSocket.send(JSON.stringify({'type': 'ping'}));
-    }
-}, 25000);
-
-// Initial scroll to bottom
-window.addEventListener('DOMContentLoaded', () => {
-    const messagesDiv = document.getElementById('chat-messages');
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-});
+    });
 </script>
 {% endblock %}

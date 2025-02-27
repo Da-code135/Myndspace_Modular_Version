@@ -50,12 +50,9 @@ ROOT_URLCONF = 'Myndspace_Modular_Version.urls'
 # Channels configuration for WebSocket
 ASGI_APPLICATION = 'Myndspace_Modular_Version.asgi.application'
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
 }
 
 # Template configuration
