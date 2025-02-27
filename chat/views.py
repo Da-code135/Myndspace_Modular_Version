@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import ChatRoom, ChatMessage
 from users.models import User
+from django.conf import settings
 
 
 @login_required
@@ -45,7 +46,8 @@ def chat_room(request, room_id):
     messages = ChatMessage.objects.filter(room=room).order_by('timestamp')
     return render(request, 'chat/room.html', {
         'room': room,
-        'messages': messages
+        'messages': messages,
+        'WEBSOCKET_URL': settings.WEBSOCKET_URL
     })
 
 @login_required

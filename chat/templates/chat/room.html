@@ -102,7 +102,11 @@
     const room_id = "{{ room_id }}";
     const websocketUrl = "{{ WEBSOCKET_URL }}";
 
-    const wsPath = new URL('/ws/chat/' + room_id + '/', websocketUrl).href;
+    let wsPath = websocketUrl;
+    if (!websocketUrl.endsWith('/')) {
+        wsPath += '/';
+    }
+    wsPath += 'ws/chat/' + room_id + '/';
 
     const chatSocket = new WebSocket(wsPath);
 // Message handling

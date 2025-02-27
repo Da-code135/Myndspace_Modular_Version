@@ -116,7 +116,8 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-
+#Websocket URL
+WEBSOCKET_URL = os.environ.get('WEBSOCKET_URL', 'ws://127.0.0.1:8000')
 
 # Security settings (for production)
 if not DEBUG:
@@ -129,3 +130,4 @@ if not DEBUG:
 
     # Add at the bottom of settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
