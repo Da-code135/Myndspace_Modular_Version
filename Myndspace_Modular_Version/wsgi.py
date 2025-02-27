@@ -15,17 +15,21 @@ framework.
 For more information, visit
 https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 """
-
 import os
-from dotenv import load_dotenv
 from django.core.wsgi import get_wsgi_application
+from dotenv import load_dotenv
+import django
+from pathlib import Path
 
-os.environ.setdefault(
-    'DJANGO_SETTINGS_MODULE',
-    'Myndspace_Modular_Version.settings')
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# This application object is used by any WSGI server configured to use this
-# file. This includes Django's development server, if the WSGI_APPLICATION
-# setting points here.
+# Load environment variables from .env file
+dotenv_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(dotenv_path)
+
+# Configure Django settings *before* accessing them
+django.setup()
+
 application = get_wsgi_application()
 

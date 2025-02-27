@@ -116,13 +116,7 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-# Zoom API Configuration
-ZOOM_CLIENT_ID = os.getenv('ZOOM_CLIENT_ID')
-ZOOM_CLIENT_SECRET = os.getenv('ZOOM_CLIENT_SECRET')
-ZOOM_REDIRECT_URI = os.getenv('ZOOM_REDIRECT_URI', 'http://localhost:8000/zoom/callback/')
-ZOOM_AUTH_URL = 'https://zoom.us/oauth/authorize'
-ZOOM_TOKEN_URL = 'https://zoom.us/oauth/token'
-ZOOM_API_URL = 'https://api.zoom.us/v2/'
+
 
 # Security settings (for production)
 if not DEBUG:

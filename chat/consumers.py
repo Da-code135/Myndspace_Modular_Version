@@ -180,7 +180,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     .select_related('sender')
                     .order_by('timestamp')[:50])
 
-    @database_sync_to_async
+
     async def send_existing_messages(self):
         messages = await self.get_messages()
         for message in messages:
