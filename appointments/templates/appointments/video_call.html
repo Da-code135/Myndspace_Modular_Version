@@ -44,6 +44,7 @@ const config = {
 let localStream;
 let peerConnections = {};
 const roomId = "{{ room_id }}";
+const userId = "{{ request.user.id }}"; // Get the user's ID
 
 // Initialize WebSocket connection
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
@@ -59,42 +60,73 @@ async function initializeCall() {
         });
         document.getElementById('local-video').srcObject = localStream;
 
-        // Send offer to other participants
-        ws.send(JSON.stringify({
-            type: 'join',
-            user: "{{ request.user.username }}"
-        }));
     } catch (error) {
         console.error('Error accessing media devices:', error);
     }
 }
 
+ws.onopen = () => {
+    console.log("WebSocket connected");
+    // Send offer to other participants
+    ws.send(JSON.stringify({
+        type: 'join',
+        user: "{{ request.user.username }}",
+        userId: userId,
+    }));
+    initializeCall();
+};
 // WebSocket message handling
 ws.onmessage = async (event) => {
     const data = JSON.parse(event.data);
+    console.log("Received message:", data); // Log all received messages
 
     switch(data.type) {
         case 'offer':
+            console.log("Received offer from:", data.sender);
             await handleOffer(data);
             break;
         case 'answer':
+            console.log("Received answer from:", data.sender);
             await handleAnswer(data);
             break;
         case 'candidate':
+            console.log("Received ICE candidate from:", data.sender);
             await handleCandidate(data);
             break;
         case 'chat':
             displayChatMessage(data);
             break;
-        case 'user-list':
+        case 'user.list': // Update the participant list
             updateParticipants(data.users);
             break;
+        case 'user.join':
+            console.log("User joined", data)
+            break;
+        case 'user.leave':
+            console.log("User left", data)
+            break;
+        default:
+            console.warn("Unknown message type:", data.type);
     }
+};
+
+ws.onclose = () => {
+    console.log("WebSocket disconnected");
+    // Clean up peer connections on disconnect
+    for (const userId in peerConnections) {
+        peerConnections[userId].close();
+        delete peerConnections[userId];
+    }
+};
+
+ws.onerror = (error) => {
+    console.error("WebSocket error:", error);
 };
 
 // WebRTC Handlers
 async function createPeerConnection(userId) {
     const pc = new RTCPeerConnection(config);
+    console.log("Creating peer connection for:", userId);
 
     // Add local stream to connection
     localStream.getTracks().forEach(track => {
@@ -103,15 +135,18 @@ async function createPeerConnection(userId) {
 
     // Handle remote streams
     pc.ontrack = (event) => {
+        console.log("Received remote stream");
         const remoteVideo = document.createElement('video');
         remoteVideo.autoplay = true;
         remoteVideo.srcObject = event.streams[0];
+        remoteVideo.id = `remote-video-${userId}`; // Unique ID for each video
         document.getElementById('remote-videos').appendChild(remoteVideo);
     };
 
     // ICE Candidate handling
     pc.onicecandidate = (event) => {
         if (event.candidate) {
+            console.log("Sending ICE candidate to:", userId);
             ws.send(JSON.stringify({
                 type: 'candidate',
                 candidate: event.candidate,
@@ -120,9 +155,113 @@ async function createPeerConnection(userId) {
         }
     };
 
+    pc.oniceconnectionstatechange = () => {
+        console.log(`ICE connection state change: ${pc.iceConnectionState}`);
+        if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+            // Clean up if the connection fails
+            console.log("Cleaning up peer connection for:", userId);
+            removeRemoteVideo(userId);
+            pc.close();
+            delete peerConnections[userId];
+        }
+    };
     return pc;
 }
 
+async function handleOffer(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling offer from ${remoteUserId}`);
+
+    if (peerConnections[remoteUserId]) {
+        console.warn(`Peer connection already exists for ${remoteUserId}. Ignoring offer.`);
+        return;
+    }
+
+    const pc = await createPeerConnection(remoteUserId);
+    peerConnections[remoteUserId] = pc;
+
+    try {
+        console.log("Setting remote description with offer:", data.payload.offer);
+        await pc.setRemoteDescription(new RTCSessionDescription(data.payload.offer));
+        console.log("Creating answer");
+        const answer = await pc.createAnswer();
+        console.log("Setting local description with answer:", answer);
+        await pc.setLocalDescription(answer);
+        console.log("Sending answer to:", remoteUserId);
+        ws.send(JSON.stringify({
+            type: 'answer',
+            answer: answer,
+            target: remoteUserId
+        }));
+    } catch (error) {
+        console.error("Error handling offer:", error);
+    }
+}
+
+async function handleAnswer(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling answer from ${remoteUserId}`);
+
+    const pc = peerConnections[remoteUserId];
+    if (!pc) {
+        console.error(`Peer connection not found for ${remoteUserId}`);
+        return;
+    }
+
+    try {
+        console.log("Setting remote description with answer:", data.answer);
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+    } catch (error) {
+        console.error("Error handling answer:", error);
+    }
+}
+
+async function handleCandidate(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling ICE candidate from ${remoteUserId}`);
+
+    const pc = peerConnections[remoteUserId];
+    if (!pc) {
+        console.error(`Peer connection not found for ${remoteUserId}`);
+        return;
+    }
+
+    try {
+        console.log("Adding ICE candidate:", data.candidate);
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    } catch (error) {
+        console.error("Error adding ICE candidate:", error);
+    }
+}
+// UI Helper functions
+
+function updateParticipants(users) {
+    const remoteVideosContainer = document.getElementById('remote-videos');
+    remoteVideosContainer.innerHTML = ''; // Clear existing videos
+
+    users.forEach(user => {
+        if (user.user_id !== userId) {
+            const videoElement = document.createElement('video');
+            videoElement.autoplay = true;
+            videoElement.id = `remote-video-${user.user_id}`;
+            remoteVideosContainer.appendChild(videoElement);
+        }
+    });
+}
+
+function displayChatMessage(data) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `${data.sender}: ${data.message}`;
+    chatMessages.appendChild(messageElement);
+}
+
+function removeRemoteVideo(userId) {
+    const remoteVideo = document.getElementById(`remote-video-${userId}`);
+    if (remoteVideo) {
+        remoteVideo.remove();
+    }
+}
 // Control Handlers
 document.getElementById('toggle-video').addEventListener('click', () => {
     const videoTrack = localStream.getVideoTracks()[0];
@@ -150,7 +289,7 @@ document.getElementById('share-screen').addEventListener('click', async () => {
 });
 
 // Initialize call when page loads
-initializeCall();
+   initializeCall();
 </script>
 
 <style>

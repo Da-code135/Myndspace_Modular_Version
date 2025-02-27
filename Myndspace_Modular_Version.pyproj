@@ -35,6 +35,9 @@
     <Compile Include="appointments\consumers.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="appointments\management\commands\delete_expired_appointments.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="appointments\routing.py">
       <SubType>Code</SubType>
     </Compile>
@@ -158,6 +161,8 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="appointments\management\" />
+    <Folder Include="appointments\management\commands\" />
     <Folder Include="chat\" />
     <Folder Include="chat\migrations\" />
     <Folder Include="chat\templates\" />

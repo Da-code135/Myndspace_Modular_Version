@@ -1,10 +1,10 @@
-
 import json
 import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from .models import Appointment
+from users.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,7 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
         self.room_group_name = None
         self.user = None
         self.appointment = None
+        self.peer_connections = {} # Track active peer connections
 
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
@@ -35,7 +36,9 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        # Notify group about new user
+        # Notify group about new user *and* existing users to the new user
+        await self.send_user_list()  # Send the current user list to the new user
+
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -55,6 +58,10 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
                 'username': self.user.username
             }
         )
+
+        # Remove peer connection if exists
+        if self.user.id in self.peer_connections:
+            del self.peer_connections[self.user.id]
 
         # Leave room group
         await self.channel_layer.group_discard(
@@ -115,20 +122,10 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
 
     async def user_join(self, event):
         # Send user list updates to all participants
-        users = await self.get_room_users()
-        await self.send(text_data=json.dumps({
-            'type': 'user.join',
-            'user_id': event['user_id'],
-            'username': event['username'],
-            'users': users
-        }))
+        await self.send_user_list()
 
     async def user_leave(self, event):
-        await self.send(text_data=json.dumps({
-            'type': 'user.leave',
-            'user_id': event['user_id'],
-            'username': event['username']
-        }))
+        await self.send_user_list()
 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
@@ -153,4 +150,52 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_room_users(self):
+        # This function is not working as intended.
+        # It returns channel names which are not what you want.
+        # This function returns connected users but not the User ID's
         return list(self.channel_layer.groups.get(self.room_group_name, {}).keys())
+
+    async def send_user_list(self):
+        user_ids = await self.get_connected_user_ids()
+        users = await self.get_user_details(user_ids)  # Fetch username for each user ID
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'update.user.list',
+                'users': users,
+            }
+        )
+
+    async def update_user_list(self, event):
+        # Send user list to the specific recipient
+        await self.send(text_data=json.dumps({
+            'type': 'user.list',
+            'users': event['users']
+        }))
+
+    @database_sync_to_async
+    def get_connected_user_ids(self):
+        group = self.channel_layer.groups.get(self.room_group_name, {})
+        channel_names = list(group.keys())
+        user_ids = set()
+
+        for channel_name in channel_names:
+             # Extract user ID from the scope associated with the channel name
+            scope = self.channel_layer.scope_for_channel(channel_name)
+            # Check if scope is not None and contains the 'user' key
+            if scope and scope.get('user'):
+                 user = scope.get('user')
+                # Check if the user is authenticated and has an ID
+                 if user and user.is_authenticated:
+                   user_ids.add(str(user.id))
+
+        return list(user_ids)
+
+    @database_sync_to_async
+    def get_user_details(self, user_ids):
+        users = []
+        for user_id in user_ids:
+            user = User.objects.get(id=user_id) # use .get
+            users.append({'user_id': str(user.id), 'username': user.username}) # Append username to list for transmission
+        return users

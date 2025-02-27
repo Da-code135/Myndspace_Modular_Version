@@ -17,6 +17,7 @@ https://docs.djangoproject.com/en/2.1/howto/deployment/wsgi/
 """
 
 import os
+from dotenv import load_dotenv
 from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault(
@@ -27,3 +28,4 @@ os.environ.setdefault(
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
 application = get_wsgi_application()
+

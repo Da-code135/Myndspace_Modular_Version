@@ -2,11 +2,10 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from Myndspace_Modular_Version import settings
-from users.models import User
+from django.conf import settings  # Import settings
 
 class TimeSlot(models.Model):
-    doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="time_slots")
+    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="time_slots")  # Use settings.AUTH_USER_MODEL
     date = models.DateField()
     start_time = models.TimeField()
     end_time = models.TimeField()
@@ -31,8 +30,8 @@ class TimeSlot(models.Model):
         return f"{self.doctor.username} - {self.date} {self.start_time}-{self.end_time}"
 
 class Appointment(models.Model):
-    doctor = models.ForeignKey(User, on_delete=models.CASCADE, related_name="doctor_appointments")
-    client = models.ForeignKey(User, on_delete=models.CASCADE, related_name="client_appointments")
+    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="doctor_appointments")  # Use settings.AUTH_USER_MODEL
+    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="client_appointments")  # Use settings.AUTH_USER_MODEL
     time_slot = models.OneToOneField(TimeSlot, on_delete=models.CASCADE, related_name="appointment", null=True, blank=True)
     date = models.DateTimeField()
     status = models.CharField(max_length=20, choices=[
@@ -65,3 +64,11 @@ class Appointment(models.Model):
         if not self.room_id:
             self.room_id = uuid.uuid4()
         return self.room_id
+
+    def is_expired(self):
+        if not self.time_slot:
+            return False
+        end_datetime = timezone.make_aware(
+            timezone.datetime.combine(self.time_slot.date, self.time_slot.end_time)
+        )
+        return end_datetime <= timezone.now()
