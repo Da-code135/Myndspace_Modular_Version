@@ -97,9 +97,12 @@
 </style>
 
 <script>
+    
+    
+    
     // Get the chat container and room ID
     const chatContainer = document.getElementById('chat-container');
-    const room_id = "{{ room.id }}"; // Access room_id from room object
+    const room_id = "{{ room.id|safe }}"; // Access room_id from room object
 
     // Construct the WebSocket URL
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
