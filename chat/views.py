@@ -1,9 +1,11 @@
 from django.db.models import Q, Count
+from django.http.response import HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import ChatRoom, ChatMessage
 from users.models import User
 from django.conf import settings
+import uuid
 
 
 @login_required
@@ -26,28 +28,6 @@ def chat_landing(request):
     return render(request, 'chat/chat_landing.html', {
         'active_chats': rooms,
         'unread_count': unread_count
-    })
-
-@login_required
-def chat_list(request):
-    if request.user.is_doctor:
-        rooms = ChatRoom.objects.filter(doctor=request.user)
-    else:
-        rooms = ChatRoom.objects.filter(client=request.user)
-    return render(request, 'chat/list.html', {'rooms': rooms})
-
-@login_required
-def chat_room(request, room_id):
-    room = get_object_or_404(ChatRoom, id=room_id)
-    
-    if request.user not in [room.doctor, room.client]:
-        return redirect('chat_list')
-    
-    messages = ChatMessage.objects.filter(room=room).order_by('timestamp')
-    return render(request, 'chat/room.html', {
-        'room': room,
-        'messages': messages,
-       
     })
 
 @login_required
@@ -81,3 +61,31 @@ def start_chat_selection(request):
     return render(request, 'chat/start_chat.html', {
         'users': users
     })
+
+@login_required
+def chat_list(request):
+    if request.user.is_doctor:
+        rooms = ChatRoom.objects.filter(doctor=request.user)
+    else:
+        rooms = ChatRoom.objects.filter(client=request.user)
+    return render(request, 'chat/list.html', {'rooms': rooms})
+
+@login_required
+def chat_room(request, room_id):
+    try:
+        room_id = uuid.UUID(str(room_id))  # Convert to UUID if it's not already
+    except ValueError:
+        # Handle the case where room_id is not a valid UUID
+        return HttpResponseBadRequest("Invalid room ID")
+
+    room = get_object_or_404(ChatRoom, id=room_id)
+    return render(request, 'chat/room.html', {'room': room})
+
+def get_chat_messages(request, room_id):
+    room = get_object_or_404(ChatRoom, id=room_id)
+    messages = ChatMessage.objects.filter(room=room).order_by('timestamp')[:settings.CHAT_MESSAGE_PAGE_SIZE]
+    return render(request, 'chat/message_list.html', {'messages': messages, 'user': request.user})
+
+def initiate_websocket(request, room_id):
+    context = {'room_id': room_id}
+    return render(request, 'chat/websocket_script.html', context, content_type='application/javascript')

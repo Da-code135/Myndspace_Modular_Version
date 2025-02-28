@@ -1,0 +1,60 @@
+<script>
+    function escapeHTML(string) {
+        let pre = document.createElement('pre');
+        let text = document.createTextNode(string);
+        pre.appendChild(text);
+        return pre.innerHTML;
+    }
+    const chatContainer = document.getElementById('chat-container');
+    const room_id = "{{ room_id }}";
+    const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsPath = wsScheme + "://" + window.location.host + "/ws/chat/" + room_id + "/";
+
+    console.log("WebSocket URL:", wsPath);
+
+    const chatSocket = new WebSocket(wsPath);
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messagesDiv = document.getElementById('chat-messages');
+
+        if (data.type === 'message') {
+            const escapedMessage = escapeHTML(data.message);
+
+            const messageHTML = `
+                <div class="message received">
+                    <div class="message-content">${escapedMessage}</div>
+                    <div class="message-meta">
+                        <small class="message-time">
+                            ${new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </small>
+                    </div>
+                </div>`;
+
+            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        else if (data.type === 'read_receipt') {
+            document.querySelectorAll(`.message.sent .message-status`).forEach(span => {
+                span.textContent = '✓✓';
+            });
+        }
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+        showConnectionWarning();
+    };
+
+    chatSocket.onerror = function (err) {
+        console.error('WebSocket error:', err);
+        showConnectionWarning();
+    };
+
+    // Keep connection alive by sending ping messages
+    setInterval(() => {
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({ 'type': 'ping' }));
+        }
+    }, 25000);
+</script>

@@ -5,9 +5,10 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.conf import settings
-from django.utils.html import escape  # For XSS protection
-from django.core.cache import cache  # For caching
+from django.utils.html import escape
+from django.core.cache import cache
 from .models import ChatRoom, ChatMessage
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +18,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_id = None
         self.user = None
         self.room_group_name = None
-        self.access_verified = False # flag to track verification
+        self.access_verified = False
 
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.user = self.scope["user"]
         self.room_group_name = f'chat_{self.room_id}'
 
-        # Verify room access and cache the result
         if not await self.verify_room_access():
             logger.warning(f"Unauthorized user {self.user.id} tried to access room {self.room_id}")
             await self.close(code=4003)
@@ -38,13 +38,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
-
-        # Defer database operations slightly
-        await asyncio.sleep(0)
-        await self.send_existing_messages()
-
-        await asyncio.sleep(0)
-        await self.mark_messages_read()
 
     async def disconnect(self, close_code):
         if hasattr(self, 'ping_task'):
@@ -66,7 +59,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         try:
             data = json.loads(text_data)
-            message_type = data.get('type')  # Use .get to avoid KeyError
+            message_type = data.get('type')
 
             if message_type == 'read_receipt':
                 await self.handle_read_receipt(data)
@@ -85,21 +78,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
             logger.error(f"Error processing message from user {self.user.id}: {e}", exc_info=True)
 
     async def handle_message(self, data):
-        message = data.get('message', '').strip() # Use .get and provide a default
+        message = data.get('message', '').strip()
         if not message:
             logger.warning(f"Empty message received from user {self.user.id}")
             return
 
-        # Sanitize the message to prevent XSS
         sanitized_message = escape(message)
 
         db_message = await self.save_message(sanitized_message)
+
+        message_html = await self.render_message(db_message)
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': sanitized_message,
+                'message_html': message_html,
                 'sender': self.user.username,
                 'timestamp': db_message.timestamp.isoformat(),
                 'message_id': db_message.id
@@ -107,7 +101,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def handle_typing(self, data):
-        typing = data.get('typing', False) # Use .get and provide a default
+        typing = data.get('typing', False)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -135,10 +129,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def chat_message(self, event):
         await self.send(json.dumps({
             'type': 'message',
-            'message': event['message'],
-            'sender': event['sender'],
-            'timestamp': event['timestamp'],
-            'message_id': event['message_id']
+            'html': event['message_html'],
         }))
 
     async def chat_typing(self, event):
@@ -159,7 +150,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         try:
             while True:
                 await self.send(json.dumps({'type': 'ping'}))
-                await asyncio.sleep(settings.PING_INTERVAL)  # Use setting for interval
+                await asyncio.sleep(settings.PING_INTERVAL)
         except asyncio.CancelledError:
             logger.info(f"Ping task cancelled for user {self.user.id}")
         except Exception as e:
@@ -182,9 +173,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             client=self.user
         ).exists()
 
-        cache.set(cache_key, access, settings.CHAT_ROOM_ACCESS_CACHE_TIMEOUT) # Use setting for timeout
+        cache.set(cache_key, access, settings.CHAT_ROOM_ACCESS_CACHE_TIMEOUT)
         return access
-
 
     @database_sync_to_async
     def save_message(self, message):
@@ -202,27 +192,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_messages(self):
         return list(ChatMessage.objects.filter(room_id=self.room_id)
                     .select_related('sender')
-                    .order_by('timestamp')[:settings.CHAT_MESSAGE_PAGE_SIZE]) # Use setting for page size
-
-
-    async def send_existing_messages(self):
-        messages = await self.get_messages()
-        for message in messages:
-            await self.send(json.dumps({
-                'type': 'message',
-                'message': message.message,
-                'sender': message.sender.username,
-                'timestamp': message.timestamp.isoformat(),
-                'message_id': message.id
-            }))
+                    .order_by('timestamp')[:settings.CHAT_MESSAGE_PAGE_SIZE])
 
     @database_sync_to_async
-    def mark_messages_read(self):
-        ChatMessage.objects.filter(
-            room_id=self.room_id,
-            read=False
-        ).exclude(sender=self.user).update(read=True)
-
-    @database_sync_to_async
-    def mark_message_read(self, message_id):
-        ChatMessage.objects.filter(id=message_id).update(read=True)
+    def render_message(self, message):
+        return render_to_string('chat/message.html', {'message': message, 'user': self.user})

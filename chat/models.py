@@ -4,9 +4,9 @@ from django.utils import timezone
 import uuid
 
 class ChatRoom(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Use UUIDs
-    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="doctor_rooms")  # Use settings.AUTH_USER_MODEL
-    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="client_rooms")  # Use settings.AUTH_USER_MODEL
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    doctor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="doctor_rooms")
+    client = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="client_rooms")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -18,7 +18,7 @@ class ChatRoom(models.Model):
 
 class ChatMessage(models.Model):
     room = models.ForeignKey(ChatRoom, on_delete=models.CASCADE, related_name="messages")
-    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Use settings.AUTH_USER_MODEL
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
