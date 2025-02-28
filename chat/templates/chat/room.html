@@ -8,11 +8,11 @@
             <small class="text-muted">(Room #{{ room.id }})</small>
         </h2>
     </div>
-    
+
     <div class="chat-messages" id="chat-messages">
         {% for message in messages %}
         <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
-            <div class="message-content">{{ message.message }}</div>
+            <div class="message-content">{{ message.message|safe }}</div>
             <div class="message-meta">
                 <small class="message-time">{{ message.timestamp|date:"H:i" }}</small>
                 {% if message.sender == request.user %}
@@ -32,7 +32,6 @@
         </button>
     </div>
 </div>
-
 
 <style>
     .chat-container {
@@ -96,94 +95,114 @@
         padding: 0.75rem 1.25rem;
     }
 </style>
+
 <script>
+    // Get the chat container and room ID
     const chatContainer = document.getElementById('chat-container');
     const room_id = "{{ room.id }}"; // Access room_id from room object
+
+    // Construct the WebSocket URL
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
     const wsPath = wsScheme + "://" + window.location.host + "/ws/chat/" + room_id + "/";
 
-    console.log("WebSocket URL:", wsPath); // Check console output for the value
+    console.log("WebSocket URL:", wsPath); // Log the WebSocket URL for debugging
 
+    // Create a new WebSocket connection
     const chatSocket = new WebSocket(wsPath);
 
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const messagesDiv = document.getElementById('chat-messages');
+    // Function to escape HTML to prevent XSS attacks
+    function escapeHTML(string) {
+        let pre = document.createElement('pre');
+        let text = document.createTextNode(string);
+        pre.appendChild(text);
+        return pre.innerHTML;
+    }
 
-        if(data.type === 'message') {
-            const isSent = data.sender === '{{ request.user.username }}';
+    // Handle incoming messages from the WebSocket
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data); // Parse the JSON data
+        const messagesDiv = document.getElementById('chat-messages'); // Get the chat messages container
+
+        if (data.type === 'message') {
+            const isSent = data.sender === '{{ request.user.username }}'; // Check if the message was sent by the current user
+            const escapedMessage = escapeHTML(data.message); // Escape the message content to prevent XSS
+
+            // Create the message HTML
             const messageHTML = `
                 <div class="message ${isSent ? 'sent' : 'received'}">
-                    <div class="message-content">${data.message}</div>
+                    <div class="message-content">${escapedMessage}</div>
                     <div class="message-meta">
                         <small class="message-time">
-                            ${new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            ${new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </small>
                         ${isSent ? `<span class="message-status">${data.read ? '✓✓' : '✓'}</span>` : ''}
                     </div>
                 </div>`;
 
-            messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            messagesDiv.insertAdjacentHTML('beforeend', messageHTML); // Add the message to the chat messages container
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom of the chat messages container
         }
-        else if(data.type === 'read_receipt') {
+        else if (data.type === 'read_receipt') {
+            // Update the read receipt status for all sent messages
             document.querySelectorAll(`.message.sent .message-status`).forEach(span => {
                 span.textContent = '✓✓';
             });
         }
     };
 
-    // Message sending
-    document.querySelector('#send-button').addEventListener('click', sendMessage);
-    document.querySelector('#message-input').addEventListener('keypress', (e) => {
-        if(e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-
+    // Message sending function
     function sendMessage() {
-        const messageInput = document.querySelector('#message-input');
-        const message = messageInput.value.trim();
+        const messageInput = document.querySelector('#message-input'); // Get the message input
+        const message = messageInput.value.trim(); // Get the message content and trim whitespace
 
-        if(message) {
+        if (message) {
             chatSocket.send(JSON.stringify({
                 'type': 'message',
                 'message': message
-}));
-            messageInput.value = '';
+            })); // Send the message to the server
+            messageInput.value = ''; // Clear the message input
         }
     }
 
+    // Add event listeners to the send button and message input
+    document.querySelector('#send-button').addEventListener('click', sendMessage); // Send message on button click
+    document.querySelector('#message-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage(); // Send message on Enter key press (without Shift key)
+        }
+    });
+
     // Connection handling
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-        showConnectionWarning();
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly'); // Log the error to the console
+        showConnectionWarning(); // Display a connection warning to the user
     };
 
-    chatSocket.onerror = function(err) {
-        console.error('WebSocket error:', err);
-        showConnectionWarning();
+    chatSocket.onerror = function (err) {
+        console.error('WebSocket error:', err); // Log the error to the console
+        showConnectionWarning(); // Display a connection warning to the user
     };
 
+    // Function to display a connection warning
     function showConnectionWarning() {
-        const warning = document.createElement('div');
-        warning.className = 'alert alert-danger mt-3';
-        warning.textContent = 'Connection lost. Please refresh the page.';
-        document.querySelector('.chat-container').appendChild(warning);
+        const warning = document.createElement('div'); // Create a new div element
+        warning.className = 'alert alert-danger mt-3'; // Add CSS classes to the div
+        warning.textContent = 'Connection lost. Please refresh the page.'; // Set the text content of the div
+        document.querySelector('.chat-container').appendChild(warning); // Add the warning to the chat container
     }
 
-    // Keep connection alive
+    // Keep connection alive by sending ping messages
     setInterval(() => {
-        if(chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({'type': 'ping'}));
+        if (chatSocket.readyState === WebSocket.OPEN) {
+            chatSocket.send(JSON.stringify({ 'type': 'ping' })); // Send a ping message
         }
     }, 25000);
 
-    // Initial scroll to bottom
+    // Scroll to the bottom of the chat messages on page load
     window.addEventListener('DOMContentLoaded', () => {
-        const messagesDiv = document.getElementById('chat-messages');
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        const messagesDiv = document.getElementById('chat-messages'); // Get the chat messages container
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom
     });
 </script>
 {% endblock %}

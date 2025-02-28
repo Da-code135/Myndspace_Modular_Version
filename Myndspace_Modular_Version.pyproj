@@ -123,6 +123,7 @@
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\room.html" />
     <Content Include="chat\templates\chat\start_chat.html" />
+    <Content Include="pending_changes.html" />
     <Content Include="requirements.txt" />
     <Content Include="static\steamroomandselfcare\css\style.css" />
     <Content Include="static\steamroomandselfcare\js\breathing.js" />

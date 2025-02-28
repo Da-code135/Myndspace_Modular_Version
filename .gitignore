@@ -366,3 +366,5 @@ FodyWeavers.xsd
 .env
 .env.*
 /.env
+/pending_changes.txt
+/pending_changes.html
