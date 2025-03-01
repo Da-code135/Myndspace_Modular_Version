@@ -89,6 +89,13 @@
 </style>
 
 <script>
+    // Function to display a connection warning
+    function showConnectionWarning() {
+        const warning = document.createElement('div'); // Create a new div element
+        warning.className = 'alert alert-danger mt-3'; // Add CSS classes to the div
+        warning.textContent = 'Connection lost. Please refresh the page.'; // Set the text content of the div
+        document.querySelector('.chat-container').appendChild(warning); // Add the warning to the chat container
+    }
     function sendMessage() {
         const messageInput = document.querySelector('#message-input');
         const message = messageInput.value.trim();

@@ -23,14 +23,14 @@ logger.info("Django settings loaded successfully")
 
 django_asgi_app = get_asgi_application()
 
-from chat.routing import websocket_urlpatterns
+import chat.routing 
 
 # Define the ASGI application
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
-                websocket_urlpatterns  # Use ONLY chat routes
+                chat.routing.websocket_urlpatterns  # Use ONLY chat routes
         )
     ),
 })

@@ -25,6 +25,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.room_group_name = f'chat_{self.room_id}'
 
+        self.ping_task = asyncio.create_task(self.send_pings())
+
         if not await self.verify_room_access():
             logger.warning(f"Unauthorized user {self.user.id} tried to access room {self.room_id}")
             await self.close(code=4003)
@@ -53,29 +55,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        if not self.access_verified:
-            logger.warning(f"Unverified user {self.user.id} attempted to send a message")
-            return
-
         try:
             data = json.loads(text_data)
             message_type = data.get('type')
 
-            if message_type == 'read_receipt':
+            if message_type == 'message':
+                await self.handle_message(data)
+            elif message_type == 'typing':
+                await self.handle_typing(data)
+            elif message_type == 'read_receipt':
                 await self.handle_read_receipt(data)
             elif message_type == 'ping':
                 await self.send(json.dumps({'type': 'pong'}))
-            elif message_type == 'typing':
-                await self.handle_typing(data)
-            elif message_type == 'message':
-                await self.handle_message(data)
             else:
                 logger.warning(f"Unknown message type: {message_type} from user {self.user.id}")
 
-        except json.JSONDecodeError:
-            logger.warning(f"Invalid JSON received from user {self.user.id}")
+        except json.JSONDecodeError as e:
+               logger.error(f"Invalid JSON received from user {self.user.id}: {e}", exc_info=True)
+               await self.send(text_data=json.dumps({'type': 'error', 'message': 'Invalid JSON'}))  # Send error to client
         except Exception as e:
-            logger.error(f"Error processing message from user {self.user.id}: {e}", exc_info=True)
+                logger.error(f"Error processing message from user {self.user.id}: {e}", exc_info=True)
+                await self.send(text_data=json.dumps({'type': 'error', 'message': 'Server error'}))  # Send error to client
 
     async def handle_message(self, data):
         message = data.get('message', '').strip()
@@ -127,9 +127,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def chat_message(self, event):
+
         await self.send(json.dumps({
             'type': 'message',
-            'html': event['message_html'],
+            'message': event['message_html'],  # changed from event[message]
+            'sender': event['sender'],
+            'timestamp': event['timestamp'],
+            'message_id': event['message_id']
         }))
 
     async def chat_typing(self, event):
