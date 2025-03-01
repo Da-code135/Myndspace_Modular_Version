@@ -49,10 +49,19 @@ ROOT_URLCONF = 'Myndspace_Modular_Version.urls'
 
 # Channels configuration for WebSocket
 ASGI_APPLICATION = 'Myndspace_Modular_Version.asgi.application'
+
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
-    }
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        'CONFIG': {
+            "exponent": 0,  # Disable message expiry
+            "capacity": 100, # Max number of messages in the queue
+            "channel_capacity": {
+                "chat.user.updates": 10
+            },
+            "origin_allowed_hosts": {'*'}, # Allow all origins for testing
+        },
+    },
 }
 
 # Template configuration
@@ -92,7 +101,22 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
-
+#Advanced logging system
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.channels': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        },
+    },
+}
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'

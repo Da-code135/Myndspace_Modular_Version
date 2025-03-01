@@ -368,3 +368,5 @@ FodyWeavers.xsd
 /.env
 /pending_changes.txt
 /pending_changes.html
+/chat/minimal_consumer.py
+/chat/templates/chat/minimal_websocket.html
