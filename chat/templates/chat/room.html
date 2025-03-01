@@ -89,32 +89,57 @@
 </style>
 
 <script>
+    function sendMessage() {
+        const messageInput = document.querySelector('#message-input');
+        const message = messageInput.value.trim();
+
+        if (message) {
+            // Check if chatSocket is available in the window object
+            if (window.chatSocket && window.chatSocket.readyState === WebSocket.OPEN) {
+                // Create a local message representation
+                const messagesDiv = document.getElementById('chat-messages');
+                const messageHTML = `
+                    <div class="message sent">
+                        <div class="message-content">${escapeHTML(message)}</div>
+                        <div class="message-meta">
+                            <small class="message-time">
+                                ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </small>
+                            <span class="message-status">✓</span>
+                        </div>
+                    </div>`;
+
+                messagesDiv.insertAdjacentHTML('beforeend', messageHTML);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                // Send to server
+                window.chatSocket.send(JSON.stringify({
+                    'type': 'message',
+                    'message': message
+                }));
+
+                messageInput.value = '';
+            } else {
+                console.error("WebSocket is not connected. Please refresh the page.");
+                if (window.showConnectionWarning) {
+                    window.showConnectionWarning();
+                } else {
+                    // Fallback if showConnectionWarning is not defined yet
+                    const warning = document.createElement('div');
+                    warning.className = 'alert alert-danger mt-3';
+                    warning.textContent = 'Connection lost. Please refresh the page.';
+                    document.querySelector('.chat-container').appendChild(warning);
+                }
+            }
+        }
+    }
+
     function escapeHTML(string) {
         let pre = document.createElement('pre');
         let text = document.createTextNode(string);
         pre.appendChild(text);
         return pre.innerHTML;
     }
-
-    function sendMessage() {
-        const messageInput = document.querySelector('#message-input');
-        const message = messageInput.value.trim();
-
-        if (message) {
-            if (chatSocket.readyState === WebSocket.OPEN) { // Check if the connection is open
-                chatSocket.send(JSON.stringify({
-                    'type': 'message',
-                    'message': message
-                }));
-                messageInput.value = '';
-            } else {
-                console.error("WebSocket is not connected. Please refresh the page.");
-                showConnectionWarning();
-            }
-        }
-    }
-
-
 
     document.querySelector('#send-button').addEventListener('click', sendMessage);
     document.querySelector('#message-input').addEventListener('keypress', (e) => {
@@ -123,12 +148,5 @@
             sendMessage();
         }
     });
-
-    function showConnectionWarning() {
-        const warning = document.createElement('div');
-        warning.className = 'alert alert-danger mt-3';
-        warning.textContent = 'Connection lost. Please refresh the page.';
-        document.querySelector('.chat-container').appendChild(warning);
-    }
 </script>
 {% endblock %}

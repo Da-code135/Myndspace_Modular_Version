@@ -5,6 +5,7 @@
         pre.appendChild(text);
         return pre.innerHTML;
     }
+
     const chatContainer = document.getElementById('chat-container');
     const room_id = "{{ room_id }}";
     const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
@@ -12,9 +13,10 @@
 
     console.log("WebSocket URL:", wsPath);
 
-    const chatSocket = new WebSocket(wsPath);
+    // Make chatSocket global so it can be accessed by functions in room.html
+    window.chatSocket = new WebSocket(wsPath);
 
-    chatSocket.onmessage = function(e) {
+    window.chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         const messagesDiv = document.getElementById('chat-messages');
 
@@ -22,12 +24,13 @@
             const escapedMessage = escapeHTML(data.message);
 
             const messageHTML = `
-                <div class="message received">
+                <div class="message ${data.is_self ? 'sent' : 'received'}">
                     <div class="message-content">${escapedMessage}</div>
                     <div class="message-meta">
                         <small class="message-time">
                             ${new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </small>
+                        ${data.is_self ? '<span class="message-status">✓</span>' : ''}
                     </div>
                 </div>`;
 
@@ -41,20 +44,38 @@
         }
     };
 
-    chatSocket.onclose = function (e) {
+    window.chatSocket.onopen = function(e) {
+        console.log('WebSocket connection established');
+        // Remove connection warnings if they exist
+        const existingWarnings = document.querySelectorAll('.alert-danger');
+        existingWarnings.forEach(warning => warning.remove());
+    };
+
+    window.chatSocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
         showConnectionWarning();
     };
 
-    chatSocket.onerror = function (err) {
+    window.chatSocket.onerror = function(err) {
         console.error('WebSocket error:', err);
         showConnectionWarning();
     };
 
+    // Define showConnectionWarning function to be globally available
+    window.showConnectionWarning = function() {
+        // Check if warning already exists
+        if (!document.querySelector('.alert-danger')) {
+            const warning = document.createElement('div');
+            warning.className = 'alert alert-danger mt-3';
+            warning.textContent = 'Connection lost. Please refresh the page.';
+            document.querySelector('.chat-container').appendChild(warning);
+        }
+    };
+
     // Keep connection alive by sending ping messages
     setInterval(() => {
-        if (chatSocket.readyState === WebSocket.OPEN) {
-            chatSocket.send(JSON.stringify({ 'type': 'ping' }));
+        if (window.chatSocket.readyState === WebSocket.OPEN) {
+            window.chatSocket.send(JSON.stringify({ 'type': 'ping' }));
         }
     }, 25000);
 </script>

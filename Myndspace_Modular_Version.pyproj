@@ -71,9 +71,6 @@
     <Compile Include="Myndspace_Modular_Version\asgi.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Myndspace_Modular_Version\routing.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="steamroomandselfcare\admin.py" />
     <Compile Include="steamroomandselfcare\apps.py" />
     <Compile Include="steamroomandselfcare\forms.py">
