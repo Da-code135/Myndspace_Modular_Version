@@ -31,7 +31,9 @@ INSTALLED_APPS = [
     'users',
     'steamroomandselfcare',
     'appointments.apps.AppointmentsConfig',  
-    'chat.apps.ChatConfig',                   
+    'chat.apps.ChatConfig',  
+    'corsheaders',
+
 ]
 
 MIDDLEWARE = [
@@ -43,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.LoginRedirectMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'Myndspace_Modular_Version.urls'
@@ -53,14 +56,7 @@ ASGI_APPLICATION = 'Myndspace_Modular_Version.asgi.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        'CONFIG': {
-            "exponent": 0,  # Disable message expiry
-            "capacity": 100, # Max number of messages in the queue
-            "channel_capacity": {
-                "chat.user.updates": 10
-            },
-            "origin_allowed_hosts": {'*'}, # Allow all origins for testing
-        },
+        
     },
 }
 
@@ -144,6 +140,11 @@ WEBSOCKET_URL = os.environ.get('WEBSOCKET_URL', 'ws://127.0.0.1:8000')
 PING_INTERVAL = 30  # Seconds
 CHAT_ROOM_ACCESS_CACHE_TIMEOUT = 60 * 60  # 1 hour
 CHAT_MESSAGE_PAGE_SIZE = 50
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  # Allow requests from the Django development server
+    "http://127.0.0.1:8000",  # Allow requests from localhost
+]
 
 # Security settings (for production)
 if not DEBUG:

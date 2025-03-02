@@ -25,7 +25,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
         self.room_group_name = f'chat_{self.room_id}'
 
-        self.ping_task = asyncio.create_task(self.send_pings())
+        
 
         if not await self.verify_room_access():
             logger.warning(f"Unauthorized user {self.user.id} tried to access room {self.room_id}")
@@ -40,6 +40,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        self.ping_task = asyncio.create_task(self.send_pings())
 
     async def disconnect(self, close_code):
         if hasattr(self, 'ping_task'):
@@ -201,3 +202,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def render_message(self, message):
         return render_to_string('chat/message.html', {'message': message, 'user': self.user})
+
+    #Testing websocket stuff
+from channels.generic.websocket import WebsocketConsumer
+
+class MinimalConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        print("Connect")
+
+    def disconnect(self, close_code):
+        pass
+
+    def receive(self, text_data):
+        pass

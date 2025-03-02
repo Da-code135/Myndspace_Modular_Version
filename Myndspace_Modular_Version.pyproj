@@ -54,9 +54,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="chat\migrations\__init__.py" />
-    <Compile Include="chat\minimal_consumer.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="chat\models.py" />
     <Compile Include="chat\routing.py">
       <SubType>Code</SubType>
@@ -125,11 +122,9 @@
     <Content Include="chat\templates\chat\chat_landing.html" />
     <Content Include="chat\templates\chat\list.html" />
     <Content Include="chat\templates\chat\message_list.html" />
-    <Content Include="chat\templates\chat\minimal_websocket.html" />
     <Content Include="chat\templates\chat\room.html" />
     <Content Include="chat\templates\chat\start_chat.html" />
     <Content Include="chat\templates\chat\websocket_script.html" />
-    <Content Include="pending_changes.html" />
     <Content Include="requirements.txt" />
     <Content Include="static\steamroomandselfcare\css\style.css" />
     <Content Include="static\steamroomandselfcare\js\breathing.js" />
