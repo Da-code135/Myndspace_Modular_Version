@@ -4,7 +4,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <Name>Myndspace_Modular_Version</Name>
     <RootNamespace>Myndspace_Modular_Version</RootNamespace>
-    <InterpreterId>MSBuild|django_app|$(MSBuildProjectFullPath)</InterpreterId>
+    <InterpreterId>MSBuild|venv|$(MSBuildProjectFullPath)</InterpreterId>
     <TestFramework>Pytest</TestFramework>
     <WebBrowserPort>8000</WebBrowserPort>
   </PropertyGroup>
@@ -113,7 +113,9 @@
     <Compile Include="Myndspace_Modular_Version\wsgi.py" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".env" />
+    <Content Include=".env">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="appointments\templates\appointments\book_appointment.html" />
     <Content Include="appointments\templates\appointments\manage_slots.html" />
     <Content Include="appointments\templates\appointments\video_call.html" />
@@ -186,10 +188,10 @@
     <Folder Include="users\templates\users\" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="..\Python Environments\django_app\">
-      <Id>django_app</Id>
-      <Version>3.9</Version>
-      <Description>django_app (Python 3.9 (64-bit))</Description>
+    <Interpreter Include="..\Python Environments\venv\">
+      <Id>venv</Id>
+      <Version>0.0</Version>
+      <Description>venv (Python 3.13 (64-bit))</Description>
       <InterpreterPath>Scripts\python.exe</InterpreterPath>
       <WindowsInterpreterPath>Scripts\pythonw.exe</WindowsInterpreterPath>
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>

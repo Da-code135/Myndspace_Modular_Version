@@ -57,7 +57,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis://default:SizvBLZTMVPtlurEoBENJhQCmddWdHVL@redis.railway.internal:6379', '')],
+            "hosts": [(os.getenv('REDIS_URL'), '')],
         },
     },
 }
@@ -80,15 +80,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Myndspace_Modular_Version.wsgi.application'
-'''
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-'''
+
 # Render live database
 import dj_database_url
 
