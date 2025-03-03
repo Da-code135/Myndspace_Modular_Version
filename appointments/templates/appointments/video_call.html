@@ -49,6 +49,7 @@ const userId = "{{ request.user.id }}"; // Get the user's ID
 // Initialize WebSocket connection
 const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
 const wsPath = `${wsScheme}://${window.location.host}/ws/video/${roomId}/`;
+
 const ws = new WebSocket(wsPath);
 
 // WebRTC Setup

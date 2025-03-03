@@ -20,7 +20,8 @@ django.setup()
 logger.info("Django settings loaded successfully")
 
 
-from chat import routing
+from chat import routing as chat_r
+from appointments import routing as video_r
 
 django_asgi_app = get_asgi_application()
 
@@ -29,7 +30,8 @@ application = ProtocolTypeRouter({
     "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
-                routing.websocket_urlpatterns  # Use ONLY chat routes
+                chat_r.chat_websocket_urlpatterns +  # Use ONLY chat routes
+                video_r.video_websocket_urlpatterns
         )
     ),
 })
