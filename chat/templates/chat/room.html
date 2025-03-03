@@ -96,7 +96,7 @@
         
         const room_id = document.getElementById('chat-container').dataset.roomId;
         const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
-        const wsPath = `${wsScheme}://${window.location.hostname}:8001/ws/chat/${room_id}/`;
+        const wsPath = `${wsScheme}://${window.location.hostname}:/ws/chat/${room_id}/`;
 
         window.chatSocket = new WebSocket(wsPath);
 
