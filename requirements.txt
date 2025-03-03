@@ -18,6 +18,7 @@ django-cors-headers==4.7.0
 djangorestframework==3.15.2
 dj-database-url==2.3.0
 exceptiongroup==1.2.2
+gunicorn==23.0.0
 h11==0.14.0
 h2==4.2.0
 hpack==4.1.0
