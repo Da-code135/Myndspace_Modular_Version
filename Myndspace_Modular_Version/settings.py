@@ -78,7 +78,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Myndspace_Modular_Version.wsgi.application'
-
+'''
 # Database
 DATABASES = {
     'default': {
@@ -86,7 +86,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+'''
+# Render live database
+import dj_database_url
 
+DATABASES = {
+    'default': dj_database_url.parse(os.getenv('DB_URL'))
+}
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
 
