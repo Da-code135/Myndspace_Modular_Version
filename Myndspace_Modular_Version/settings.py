@@ -55,8 +55,10 @@ ASGI_APPLICATION = 'Myndspace_Modular_Version.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
-        
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis://default:SizvBLZTMVPtlurEoBENJhQCmddWdHVL@redis.railway.internal:6379', '')],
+        },
     },
 }
 
