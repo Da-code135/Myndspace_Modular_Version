@@ -1,4 +1,5 @@
 {% for message in messages %}
+
 <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
     <div class="message-content">{{ message.message|safe }}</div>
     <div class="message-meta">

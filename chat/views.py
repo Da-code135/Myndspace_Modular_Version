@@ -89,9 +89,3 @@ def get_chat_messages(request, room_id):
 def initiate_websocket(request, room_id):
     context = {'room_id': room_id}
     return render(request, 'chat/websocket_script.html', context, content_type='application/javascript')
-# DEBUGIING STUFF
-
-from django.shortcuts import render
-
-def minimal_websocket_view(request):
-    return render(request, 'chat/minimal_websocket.html')

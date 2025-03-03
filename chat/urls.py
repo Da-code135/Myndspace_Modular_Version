@@ -10,5 +10,5 @@ urlpatterns = [
     path('room/<uuid:room_id>/', views.chat_room, name='chat_room'),
     path('messages/<uuid:room_id>/', views.get_chat_messages, name='chat_messages'),
     path('initiate_websocket/<uuid:room_id>/', views.initiate_websocket, name='initiate_websocket'),
-    path('minimal/', views.minimal_websocket_view, name='minimal_websocket'),
+
 ]
