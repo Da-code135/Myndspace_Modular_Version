@@ -144,6 +144,7 @@ CHAT_MESSAGE_PAGE_SIZE = 50
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",  # Allow requests from the Django development server
     "http://127.0.0.1:8000",  # Allow requests from localhost
+    "https://myndspace.onrender.com",
 ]
 
 # Security settings (for production)
