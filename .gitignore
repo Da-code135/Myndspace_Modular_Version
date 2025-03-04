@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /pending_changes.html
 /chat/minimal_consumer.py
 /chat/templates/chat/minimal_websocket.html
+/.env
