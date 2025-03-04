@@ -188,7 +188,7 @@
     <Folder Include="users\templates\users\" />
   </ItemGroup>
   <ItemGroup>
-    <Interpreter Include="..\Python Environments\venv\">
+    <Interpreter Include="venv\">
       <Id>venv</Id>
       <Version>0.0</Version>
       <Description>venv (Python 3.13 (64-bit))</Description>

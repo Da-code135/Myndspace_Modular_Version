@@ -133,9 +133,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-#Websocket URL
-WEBSOCKET_URL = os.environ.get('WEBSOCKET_URL', 'ws://127.0.0.1:8000')
-
 # Chat settings
 PING_INTERVAL = 30  # Seconds
 CHAT_ROOM_ACCESS_CACHE_TIMEOUT = 60 * 60  # 1 hour
