@@ -21,18 +21,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    #Apps
+    'users',
     # Third-party apps
     'channels',
     'rest_framework',
     
-    # Local apps
     
-    'users',
-    'steamroomandselfcare',
-    'appointments.apps.AppointmentsConfig',  
-    'chat.apps.ChatConfig',  
-    'corsheaders',
 
 ]
 
@@ -88,7 +83,7 @@ DATABASES = {
 }
 
 # Custom User Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = ''
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
