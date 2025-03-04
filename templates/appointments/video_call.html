@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="video-container">
+    <div class="main-video">
+        <video id="local-video" autoplay muted></video>
+        <div class="controls">
+            <button id="toggle-video" class="btn-control">
+                <i class="bi bi-camera-video"></i>
+            </button>
+            <button id="toggle-audio" class="btn-control">
+                <i class="bi bi-mic"></i>
+            </button>
+            <button id="share-screen" class="btn-control">
+                <i class="bi bi-laptop"></i>
+            </button>
+            <button id="end-call" class="btn-control btn-danger">
+                <i class="bi bi-telephone-x"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="participants" id="remote-videos"></div>
+
+    <div class="chat-container">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Type message...">
+            <button id="send-message" class="btn-control">
+                <i class="bi bi-send"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const config = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        // Add TURN servers here for production
+    ]
+};
+
+let localStream;
+let peerConnections = {};
+const roomId = "{{ room_id }}";
+const userId = "{{ request.user.id }}"; // Get the user's ID
+
+// Initialize WebSocket connection
+const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+const wsPath = `${wsScheme}://${window.location.host}/ws/video/${roomId}/`;
+
+const ws = new WebSocket(wsPath);
+
+// WebRTC Setup
+async function initializeCall() {
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true
+        });
+        document.getElementById('local-video').srcObject = localStream;
+
+    } catch (error) {
+        console.error('Error accessing media devices:', error);
+    }
+}
+
+ws.onopen = () => {
+    console.log("WebSocket connected");
+    // Send offer to other participants
+    ws.send(JSON.stringify({
+        type: 'join',
+        user: "{{ request.user.username }}",
+        userId: userId,
+    }));
+    initializeCall();
+};
+// WebSocket message handling
+ws.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    console.log("Received message:", data); // Log all received messages
+
+    switch(data.type) {
+        case 'offer':
+            console.log("Received offer from:", data.sender);
+            await handleOffer(data);
+            break;
+        case 'answer':
+            console.log("Received answer from:", data.sender);
+            await handleAnswer(data);
+            break;
+        case 'candidate':
+            console.log("Received ICE candidate from:", data.sender);
+            await handleCandidate(data);
+            break;
+        case 'chat':
+            displayChatMessage(data);
+            break;
+        case 'user.list': // Update the participant list
+            updateParticipants(data.users);
+            break;
+        case 'user.join':
+            console.log("User joined", data)
+            break;
+        case 'user.leave':
+            console.log("User left", data)
+            break;
+        default:
+            console.warn("Unknown message type:", data.type);
+    }
+};
+
+ws.onclose = () => {
+    console.log("WebSocket disconnected");
+    // Clean up peer connections on disconnect
+    for (const userId in peerConnections) {
+        peerConnections[userId].close();
+        delete peerConnections[userId];
+    }
+};
+
+ws.onerror = (error) => {
+    console.error("WebSocket error:", error);
+};
+
+// WebRTC Handlers
+async function createPeerConnection(userId) {
+    const pc = new RTCPeerConnection(config);
+    console.log("Creating peer connection for:", userId);
+
+    // Add local stream to connection
+    localStream.getTracks().forEach(track => {
+        pc.addTrack(track, localStream);
+    });
+
+    // Handle remote streams
+    pc.ontrack = (event) => {
+        console.log("Received remote stream");
+        const remoteVideo = document.createElement('video');
+        remoteVideo.autoplay = true;
+        remoteVideo.srcObject = event.streams[0];
+        remoteVideo.id = `remote-video-${userId}`; // Unique ID for each video
+        document.getElementById('remote-videos').appendChild(remoteVideo);
+    };
+
+    // ICE Candidate handling
+    pc.onicecandidate = (event) => {
+        if (event.candidate) {
+            console.log("Sending ICE candidate to:", userId);
+            ws.send(JSON.stringify({
+                type: 'candidate',
+                candidate: event.candidate,
+                target: userId
+            }));
+        }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+        console.log(`ICE connection state change: ${pc.iceConnectionState}`);
+        if (pc.iceConnectionState === 'disconnected' || pc.iceConnectionState === 'failed') {
+            // Clean up if the connection fails
+            console.log("Cleaning up peer connection for:", userId);
+            removeRemoteVideo(userId);
+            pc.close();
+            delete peerConnections[userId];
+        }
+    };
+    return pc;
+}
+
+async function handleOffer(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling offer from ${remoteUserId}`);
+
+    if (peerConnections[remoteUserId]) {
+        console.warn(`Peer connection already exists for ${remoteUserId}. Ignoring offer.`);
+        return;
+    }
+
+    const pc = await createPeerConnection(remoteUserId);
+    peerConnections[remoteUserId] = pc;
+
+    try {
+        console.log("Setting remote description with offer:", data.payload.offer);
+        await pc.setRemoteDescription(new RTCSessionDescription(data.payload.offer));
+        console.log("Creating answer");
+        const answer = await pc.createAnswer();
+        console.log("Setting local description with answer:", answer);
+        await pc.setLocalDescription(answer);
+        console.log("Sending answer to:", remoteUserId);
+        ws.send(JSON.stringify({
+            type: 'answer',
+            answer: answer,
+            target: remoteUserId
+        }));
+    } catch (error) {
+        console.error("Error handling offer:", error);
+    }
+}
+
+async function handleAnswer(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling answer from ${remoteUserId}`);
+
+    const pc = peerConnections[remoteUserId];
+    if (!pc) {
+        console.error(`Peer connection not found for ${remoteUserId}`);
+        return;
+    }
+
+    try {
+        console.log("Setting remote description with answer:", data.answer);
+        await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+    } catch (error) {
+        console.error("Error handling answer:", error);
+    }
+}
+
+async function handleCandidate(data) {
+    const remoteUserId = data.sender;
+    console.log(`Handling ICE candidate from ${remoteUserId}`);
+
+    const pc = peerConnections[remoteUserId];
+    if (!pc) {
+        console.error(`Peer connection not found for ${remoteUserId}`);
+        return;
+    }
+
+    try {
+        console.log("Adding ICE candidate:", data.candidate);
+        await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    } catch (error) {
+        console.error("Error adding ICE candidate:", error);
+    }
+}
+// UI Helper functions
+
+function updateParticipants(users) {
+    const remoteVideosContainer = document.getElementById('remote-videos');
+    remoteVideosContainer.innerHTML = ''; // Clear existing videos
+
+    users.forEach(user => {
+        if (user.user_id !== userId) {
+            const videoElement = document.createElement('video');
+            videoElement.autoplay = true;
+            videoElement.id = `remote-video-${user.user_id}`;
+            remoteVideosContainer.appendChild(videoElement);
+        }
+    });
+}
+
+function displayChatMessage(data) {
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `${data.sender}: ${data.message}`;
+    chatMessages.appendChild(messageElement);
+}
+
+function removeRemoteVideo(userId) {
+    const remoteVideo = document.getElementById(`remote-video-${userId}`);
+    if (remoteVideo) {
+        remoteVideo.remove();
+    }
+}
+// Control Handlers
+document.getElementById('toggle-video').addEventListener('click', () => {
+    const videoTrack = localStream.getVideoTracks()[0];
+    videoTrack.enabled = !videoTrack.enabled;
+});
+
+document.getElementById('toggle-audio').addEventListener('click', () => {
+    const audioTrack = localStream.getAudioTracks()[0];
+    audioTrack.enabled = !audioTrack.enabled;
+});
+
+document.getElementById('share-screen').addEventListener('click', async () => {
+    try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia();
+        const screenTrack = screenStream.getVideoTracks()[0];
+
+        // Replace video track in all peer connections
+        Object.values(peerConnections).forEach(pc => {
+            const sender = pc.getSenders().find(s => s.track.kind === 'video');
+            sender.replaceTrack(screenTrack);
+        });
+    } catch (error) {
+        console.error('Screen sharing failed:', error);
+    }
+});
+
+// Initialize call when page loads
+   initializeCall();
+</script>
+
+<style>
+    .video-container {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 20px;
+        height: 80vh;
+    }
+
+    .main-video video {
+        width: 100%;
+        height: 70vh;
+        background: #000;
+        border-radius: 10px;
+    }
+
+    .participants {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .chat-container {
+        border-left: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-control {
+        padding: 15px;
+        border-radius: 50%;
+        border: none;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

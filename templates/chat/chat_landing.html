@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">
+                <i class="bi bi-chat-dots me-2"></i>Messages
+                {% if unread_count %}
+                <span class="badge bg-primary">{{ unread_count }}</span>
+                {% endif %}
+            </h3>
+            
+            <a href="{% url 'start_chat_selection' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> New Chat
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="list-group">
+                {% for room in active_chats %}
+                <a href="{% url 'chat_room' room.id %}"
+                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">
+                            {% if user.is_doctor %}
+                            {{ room.client.get_full_name|default:room.client.username }}
+                            {% else %}
+                            Dr. {{ room.doctor.get_full_name|default:room.doctor.username }}
+                            {% endif %}
+                        </h6>
+                        <small class="text-muted">
+                            {{ room.messages.last.message|truncatechars:40 }}
+                        </small>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted">{{ room.messages.last.timestamp|timesince }} ago</small>
+                        {% if room.unread_count > 0 %}
+                        <span class="badge bg-danger ms-2">{{ room.unread_count }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% empty %}
+                <div class="text-muted p-3">No active conversations</div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+    }
+
+    .badge {
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}

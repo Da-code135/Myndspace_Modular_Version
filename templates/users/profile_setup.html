@@ -1,0 +1,20 @@
+{% extends 'users/base.html' %}
+{% block title %}Profile Setup{% endblock %}
+{% block content %}
+<h2>Complete Your Profile</h2>
+<form method="post">
+    {% csrf_token %}
+    {% if user.is_doctor %}
+    <div class="mb-3">
+        <label for="specialization" class="form-label">Specialization</label>
+        <input type="text" class="form-control" name="specialization" required>
+    </div>
+    <div class="mb-3">
+        <label for="experience" class="form-label">Experience (years)</label>
+        <input type="number" class="form-control" name="experience" min="0" required>
+    </div>
+
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Complete Profile</button>
+</form>
+{% endblock %}

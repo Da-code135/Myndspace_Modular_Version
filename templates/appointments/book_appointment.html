@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Available Appointments</h1>
+
+
+<ul>
+    {% for slot in slots %}
+    <li>
+        {{ slot.doctor.get_full_name }} - {{ slot.date }} {{ slot.start_time }}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="slot_id" value="{{ slot.id }}">
+            <button type="submit">Book Now</button>
+        </form>
+    </li>
+    {% empty %}
+    <li>No available slots found</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "steamroomandselfcare/base.html" %}
+{% load static %}
+{% block content %}
+<h2>Meditation & Mindful Exercises</h2>
+<p>Relax and unwind with this guided meditation session.</p>
+
+<!-- Audio player for a meditation track -->
+<audio controls>
+    <source src="{% static 'steamroomandselfcare/audio/meditation_track.mp3' %}" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<!-- Optional: Embed visual aids or animations -->
+<div id="meditation-visual">
+    <img src="{% static 'steamroomandselfcare/images/meditation_image.jpg' %}" alt="Meditation Visual" style="max-width:100%;">
+</div>
+{% endblock %}

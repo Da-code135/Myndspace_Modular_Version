@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Breathing Exercise{% endblock %}
+
+{% block content %}
+<h2>Breathing Exercise</h2>
+<p>Follow the guided breathing exercise below.</p>
+<div id="breathing-timer" style="font-size: 2rem; margin-top: 1rem;"></div>
+<script src="{% static 'steamroomandselfcare/js/breathing.js' %}"></script>
+{% endblock %}

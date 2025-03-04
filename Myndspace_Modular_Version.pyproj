@@ -143,12 +143,6 @@
     <Content Include="requirements.txt" />
     <Content Include="static\steamroomandselfcare\css\style.css" />
     <Content Include="static\steamroomandselfcare\js\breathing.js" />
-    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\js\breathing.js">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\css\style.css">
-      <SubType>Code</SubType>
-    </Content>
     <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\landing.html" />
     <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\meditation.html" />
     <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\base.html" />
@@ -162,6 +156,30 @@
     <Content Include="Myndspace_Modular_Version\users\templates\users\login.html" />
     <Content Include="Myndspace_Modular_Version\users\templates\users\profile_setup.html" />
     <Content Include="Myndspace_Modular_Version\users\templates\users\register.html" />
+    <Content Include="templates\appointments\base.html" />
+    <Content Include="templates\appointments\book_appointment.html" />
+    <Content Include="templates\appointments\manage_slots.html" />
+    <Content Include="templates\appointments\video_call.html" />
+    <Content Include="templates\base.html" />
+    <Content Include="templates\chat\base.html" />
+    <Content Include="templates\chat\chat_landing.html" />
+    <Content Include="templates\chat\list.html" />
+    <Content Include="templates\chat\message_list.html" />
+    <Content Include="templates\chat\room.html" />
+    <Content Include="templates\chat\start_chat.html" />
+    <Content Include="templates\chat\websocket_script.html" />
+    <Content Include="templates\dashboard.html" />
+    <Content Include="templates\landing_page.html" />
+    <Content Include="templates\steamroomandselfcare\base.html" />
+    <Content Include="templates\steamroomandselfcare\breathing_exercise.html" />
+    <Content Include="templates\steamroomandselfcare\journaling.html" />
+    <Content Include="templates\steamroomandselfcare\landing.html" />
+    <Content Include="templates\steamroomandselfcare\meditation.html" />
+    <Content Include="templates\steamroomandselfcare\thought_logs.html" />
+    <Content Include="templates\users\base.html" />
+    <Content Include="templates\users\login.html" />
+    <Content Include="templates\users\profile_setup.html" />
+    <Content Include="templates\users\register.html" />
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.html">
@@ -191,6 +209,7 @@
     <Folder Include="Myndspace_Modular_Version\chat\migrations\" />
     <Folder Include="Myndspace_Modular_Version\chat\templates\" />
     <Folder Include="Myndspace_Modular_Version\chat\templates\chat\" />
+    <Folder Include="templates\" />
     <Folder Include="static\" />
     <Folder Include="static\steamroomandselfcare\" />
     <Folder Include="static\steamroomandselfcare\audio\" />
@@ -199,12 +218,6 @@
     <Folder Include="static\steamroomandselfcare\js\" />
     <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\" />
     <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\migrations\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\js\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\images\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\audio\" />
-    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\css\" />
     <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\templates\" />
     <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\" />
     <Folder Include="Myndspace_Modular_Version\users\" />
@@ -213,6 +226,10 @@
     <Folder Include="Myndspace_Modular_Version\" />
     <Folder Include="Myndspace_Modular_Version\users\templates\" />
     <Folder Include="Myndspace_Modular_Version\users\templates\users\" />
+    <Folder Include="templates\appointments\" />
+    <Folder Include="templates\chat\" />
+    <Folder Include="templates\steamroomandselfcare\" />
+    <Folder Include="templates\users\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Django.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

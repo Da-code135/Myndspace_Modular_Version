@@ -1,0 +1,43 @@
+{% extends 'appointments/base.html' %}
+
+{% block title %}Time management{% endblock %}
+
+{% block content %}
+<h1>Manage Time Slots</h1>
+<form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom: 10px;">
+        <label class="form-label">
+            Date:
+            <input type="date" name="date" required class="form-input">
+        </label>
+        <label class="form-label">
+            Start Time:
+            <input type="time" name="start_time" required class="form-input">
+        </label>
+        <label class="form-label">
+            End Time:
+            <input type="time" name="end_time" required class="form-input">
+        </label>
+        <button type="submit" name="create_slot" class="btn-primary">Create Slot</button>
+    </div>
+</form>
+
+<h2>Your Time Slots</h2>
+<ul>
+    {% for slot in slots %}
+    <li>
+        {{ slot.date }} {{ slot.start_time }} - {{ slot.end_time }}
+        {% if not slot.is_booked %}
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="slot_id" value="{{ slot.id }}">
+            <button type="submit" name="delete_slot">Delete</button>
+        </form>
+        {% else %}
+        (Booked)
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
