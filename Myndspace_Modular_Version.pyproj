@@ -33,21 +33,20 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="appointments\consumers.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="appointments\management\commands\delete_expired_appointments.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="appointments\routing.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="appointments\serializers.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="appointments\urls.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="Myndspace_Modular_Version\appointments\admin.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\apps.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\consumers.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\management\commands\delete_expired_appointments.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\migrations\0001_initial.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\migrations\0002_initial.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\migrations\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\models.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\routing.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\serializers.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\tests.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\urls.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\views.py" />
+    <Compile Include="Myndspace_Modular_Version\appointments\__init__.py" />
     <Compile Include="Myndspace_Modular_Version\chat\admin.py" />
     <Compile Include="Myndspace_Modular_Version\chat\apps.py" />
     <Compile Include="Myndspace_Modular_Version\chat\consumers.py">
@@ -85,13 +84,6 @@
     <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\views.py" />
     <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\__init__.py" />
     <Compile Include="Myndspace_Modular_Version\users\admin.py" />
-    <Compile Include="appointments\admin.py" />
-    <Compile Include="appointments\apps.py" />
-    <Compile Include="appointments\migrations\__init__.py" />
-    <Compile Include="appointments\models.py" />
-    <Compile Include="appointments\tests.py" />
-    <Compile Include="appointments\views.py" />
-    <Compile Include="appointments\__init__.py" />
     <Compile Include="Myndspace_Modular_Version\users\apps.py" />
     <Compile Include="Myndspace_Modular_Version\users\forms.py">
       <SubType>Code</SubType>
@@ -114,10 +106,33 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".env" />
-    <Content Include="appointments\templates\appointments\book_appointment.html" />
-    <Content Include="appointments\templates\appointments\manage_slots.html" />
-    <Content Include="appointments\templates\appointments\video_call.html" />
-    <Content Include="appointments\templates\appointments\base.html" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\0001_initial.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\0001_initial.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\0002_appointment_time_slot_alter_appointment_status.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\0002_initial.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\0002_initial.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\__init__.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\__init__.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\templates\appointments\base.html" />
+    <Content Include="Myndspace_Modular_Version\appointments\templates\appointments\book_appointment.html" />
+    <Content Include="Myndspace_Modular_Version\appointments\templates\appointments\manage_slots.html" />
+    <Content Include="Myndspace_Modular_Version\appointments\templates\appointments\video_call.html" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\admin.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\admin.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\apps.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\apps.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\consumers.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\consumers.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\models.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\models.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\routing.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\routing.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\urls.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\urls.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\views.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\views.cpython-39.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\__init__.cpython-313.pyc" />
+    <Content Include="Myndspace_Modular_Version\appointments\__pycache__\__init__.cpython-39.pyc" />
     <Content Include="Myndspace_Modular_Version\chat\templates\chat\base.html" />
     <Content Include="Myndspace_Modular_Version\chat\templates\chat\chat_landing.html" />
     <Content Include="Myndspace_Modular_Version\chat\templates\chat\list.html" />
@@ -165,9 +180,13 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="appointments\" />
-    <Folder Include="appointments\management\" />
-    <Folder Include="appointments\management\commands\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\management\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\management\commands\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\migrations\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\migrations\__pycache__\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\templates\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\templates\appointments\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\__pycache__\" />
     <Folder Include="Myndspace_Modular_Version\chat\" />
     <Folder Include="Myndspace_Modular_Version\chat\migrations\" />
     <Folder Include="Myndspace_Modular_Version\chat\templates\" />
@@ -190,9 +209,6 @@
     <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\" />
     <Folder Include="Myndspace_Modular_Version\users\" />
     <Folder Include="Myndspace_Modular_Version\appointments\" />
-    <Folder Include="appointments\migrations\" />
-    <Folder Include="appointments\templates\" />
-    <Folder Include="appointments\templates\appointments\" />
     <Folder Include="Myndspace_Modular_Version\users\migrations\" />
     <Folder Include="Myndspace_Modular_Version\" />
     <Folder Include="Myndspace_Modular_Version\users\templates\" />
