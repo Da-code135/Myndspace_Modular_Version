@@ -48,43 +48,43 @@
     <Compile Include="appointments\urls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="chat\admin.py" />
-    <Compile Include="chat\apps.py" />
-    <Compile Include="chat\consumers.py">
+    <Compile Include="Myndspace_Modular_Version\chat\admin.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\apps.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\consumers.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="chat\migrations\__init__.py" />
-    <Compile Include="chat\models.py" />
-    <Compile Include="chat\routing.py">
+    <Compile Include="Myndspace_Modular_Version\chat\migrations\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\models.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\routing.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="chat\tests.py" />
-    <Compile Include="chat\urls.py">
+    <Compile Include="Myndspace_Modular_Version\chat\tests.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\urls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="chat\views.py" />
-    <Compile Include="chat\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\views.py" />
+    <Compile Include="Myndspace_Modular_Version\chat\__init__.py" />
     <Compile Include="manage.py" />
     <Compile Include="Myndspace_Modular_Version\asgi.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="steamroomandselfcare\admin.py" />
-    <Compile Include="steamroomandselfcare\apps.py" />
-    <Compile Include="steamroomandselfcare\forms.py">
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\admin.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\apps.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\forms.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="steamroomandselfcare\migrations\__init__.py" />
-    <Compile Include="steamroomandselfcare\models.py" />
-    <Compile Include="steamroomandselfcare\nlp.py">
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\migrations\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\models.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\nlp.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="steamroomandselfcare\tests.py" />
-    <Compile Include="steamroomandselfcare\urls.py">
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\tests.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\urls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="steamroomandselfcare\views.py" />
-    <Compile Include="steamroomandselfcare\__init__.py" />
-    <Compile Include="users\admin.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\views.py" />
+    <Compile Include="Myndspace_Modular_Version\steamroomandselfcare\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\users\admin.py" />
     <Compile Include="appointments\admin.py" />
     <Compile Include="appointments\apps.py" />
     <Compile Include="appointments\migrations\__init__.py" />
@@ -92,21 +92,21 @@
     <Compile Include="appointments\tests.py" />
     <Compile Include="appointments\views.py" />
     <Compile Include="appointments\__init__.py" />
-    <Compile Include="users\apps.py" />
-    <Compile Include="users\forms.py">
+    <Compile Include="Myndspace_Modular_Version\users\apps.py" />
+    <Compile Include="Myndspace_Modular_Version\users\forms.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="users\middleware.py">
+    <Compile Include="Myndspace_Modular_Version\users\middleware.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="users\migrations\__init__.py" />
-    <Compile Include="users\models.py" />
-    <Compile Include="users\tests.py" />
-    <Compile Include="users\urls.py">
+    <Compile Include="Myndspace_Modular_Version\users\migrations\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\users\models.py" />
+    <Compile Include="Myndspace_Modular_Version\users\tests.py" />
+    <Compile Include="Myndspace_Modular_Version\users\urls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="users\views.py" />
-    <Compile Include="users\__init__.py" />
+    <Compile Include="Myndspace_Modular_Version\users\views.py" />
+    <Compile Include="Myndspace_Modular_Version\users\__init__.py" />
     <Compile Include="Myndspace_Modular_Version\__init__.py" />
     <Compile Include="Myndspace_Modular_Version\settings.py" />
     <Compile Include="Myndspace_Modular_Version\urls.py" />
@@ -117,35 +117,36 @@
     <Content Include="appointments\templates\appointments\book_appointment.html" />
     <Content Include="appointments\templates\appointments\manage_slots.html" />
     <Content Include="appointments\templates\appointments\video_call.html" />
-    <Content Include="appointments\templates\base.html" />
-    <Content Include="chat\templates\chat\base.html" />
-    <Content Include="chat\templates\chat\chat_landing.html" />
-    <Content Include="chat\templates\chat\list.html" />
-    <Content Include="chat\templates\chat\message_list.html" />
-    <Content Include="chat\templates\chat\room.html" />
-    <Content Include="chat\templates\chat\start_chat.html" />
-    <Content Include="chat\templates\chat\websocket_script.html" />
+    <Content Include="appointments\templates\appointments\base.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\base.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\chat_landing.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\list.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\message_list.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\room.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\start_chat.html" />
+    <Content Include="Myndspace_Modular_Version\chat\templates\chat\websocket_script.html" />
     <Content Include="requirements.txt" />
     <Content Include="static\steamroomandselfcare\css\style.css" />
     <Content Include="static\steamroomandselfcare\js\breathing.js" />
-    <Content Include="steamroomandselfcare\static\steamroomandselfcare\js\breathing.js">
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\js\breathing.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="steamroomandselfcare\static\steamroomandselfcare\css\style.css">
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\css\style.css">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\landing.html" />
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\meditation.html" />
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\base.html" />
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\breathing_exercise.html" />
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\journaling.html" />
-    <Content Include="steamroomandselfcare\templates\steamroomandselfcare\thought_logs.html" />
-    <Content Include="users\templates\dashboard.html" />
-    <Content Include="users\templates\base.html" />
-    <Content Include="users\templates\landing_page.html" />
-    <Content Include="users\templates\users\login.html" />
-    <Content Include="users\templates\users\profile_setup.html" />
-    <Content Include="users\templates\users\register.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\landing.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\meditation.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\base.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\breathing_exercise.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\journaling.html" />
+    <Content Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\thought_logs.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\dashboard.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\base.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\landing_page.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\users\base.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\users\login.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\users\profile_setup.html" />
+    <Content Include="Myndspace_Modular_Version\users\templates\users\register.html" />
   </ItemGroup>
   <ItemGroup>
     <None Include="readme.html">
@@ -164,37 +165,38 @@
     </Interpreter>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="appointments\" />
     <Folder Include="appointments\management\" />
     <Folder Include="appointments\management\commands\" />
-    <Folder Include="chat\" />
-    <Folder Include="chat\migrations\" />
-    <Folder Include="chat\templates\" />
-    <Folder Include="chat\templates\chat\" />
+    <Folder Include="Myndspace_Modular_Version\chat\" />
+    <Folder Include="Myndspace_Modular_Version\chat\migrations\" />
+    <Folder Include="Myndspace_Modular_Version\chat\templates\" />
+    <Folder Include="Myndspace_Modular_Version\chat\templates\chat\" />
     <Folder Include="static\" />
     <Folder Include="static\steamroomandselfcare\" />
     <Folder Include="static\steamroomandselfcare\audio\" />
     <Folder Include="static\steamroomandselfcare\css\" />
     <Folder Include="static\steamroomandselfcare\images\" />
     <Folder Include="static\steamroomandselfcare\js\" />
-    <Folder Include="steamroomandselfcare\" />
-    <Folder Include="steamroomandselfcare\migrations\" />
-    <Folder Include="steamroomandselfcare\static\" />
-    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\" />
-    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\js\" />
-    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\images\" />
-    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\audio\" />
-    <Folder Include="steamroomandselfcare\static\steamroomandselfcare\css\" />
-    <Folder Include="steamroomandselfcare\templates\" />
-    <Folder Include="steamroomandselfcare\templates\steamroomandselfcare\" />
-    <Folder Include="users\" />
-    <Folder Include="appointments\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\migrations\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\js\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\images\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\audio\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\static\steamroomandselfcare\css\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\templates\" />
+    <Folder Include="Myndspace_Modular_Version\steamroomandselfcare\templates\steamroomandselfcare\" />
+    <Folder Include="Myndspace_Modular_Version\users\" />
+    <Folder Include="Myndspace_Modular_Version\appointments\" />
     <Folder Include="appointments\migrations\" />
     <Folder Include="appointments\templates\" />
     <Folder Include="appointments\templates\appointments\" />
-    <Folder Include="users\migrations\" />
+    <Folder Include="Myndspace_Modular_Version\users\migrations\" />
     <Folder Include="Myndspace_Modular_Version\" />
-    <Folder Include="users\templates\" />
-    <Folder Include="users\templates\users\" />
+    <Folder Include="Myndspace_Modular_Version\users\templates\" />
+    <Folder Include="Myndspace_Modular_Version\users\templates\users\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Django.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

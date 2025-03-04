@@ -28,3 +28,7 @@ class DoctorProfile(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+class ClientProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client_profile")
+    condition = models.CharField(max_length=100, default="General")

@@ -10,7 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
 SECRET_KEY = os.getenv('SECRET_KEY')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1').split(' ')
 
 # Application definition
@@ -133,9 +133,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'landing_page'
 
-#Websocket URL
-WEBSOCKET_URL = os.environ.get('WEBSOCKET_URL', 'ws://127.0.0.1:8000')
-
 # Chat settings
 PING_INTERVAL = 30  # Seconds
 CHAT_ROOM_ACCESS_CACHE_TIMEOUT = 60 * 60  # 1 hour
@@ -147,13 +144,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # Security settings (for production)
-if not DEBUG:
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
 
     # Add at the bottom of settings.py
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

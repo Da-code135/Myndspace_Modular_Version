@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-
+{% extends 'users/base.html' %}
+{% block title %}Profile Setup{% endblock %}
 {% block content %}
 <h2>Complete Your Profile</h2>
 <form method="post">
@@ -13,8 +13,8 @@
         <label for="experience" class="form-label">Experience (years)</label>
         <input type="number" class="form-control" name="experience" min="0" required>
     </div>
-    
+
     {% endif %}
-    <button type="submit" class="btn btn-primary">Complete Setup</button>
+    <button type="submit" class="btn btn-primary">Complete Profile</button>
 </form>
 {% endblock %}
